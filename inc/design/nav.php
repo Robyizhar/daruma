@@ -1,11 +1,11 @@
 <?php
-$current_page = basename($_SERVER['PHP_SELF']);
+    $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <nav id="nav-menu">
-    <a href="/index.php" class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">Home</a>
-    <a href="/inc/products.php" class="<?php echo ($current_page == 'products.php') ? 'active' : ''; ?>">Products</a>
-    <a href="/inc/about.php" class="<?php echo ($current_page == 'about.php') ? 'active' : ''; ?>">About Us</a>
-    <a href="/inc/account.php" class="<?php echo ($current_page == 'account.php') ? 'active' : ''; ?>">Account</a>
-    <a href="/inc/register.php" class="<?php echo ($current_page == 'register.php') ? 'active' : ''; ?>">Register</a>
+    <a href="<?= base_url('index.php') ?>" class="<?= ($current_page == 'index.php') ? 'active' : ''; ?>">Home</a>
+    <a href="<?= base_url('inc/products.php') ?>" class="<?= ($current_page == 'products.php') ? 'active' : ''; ?>">Products</a>
+    <a href="<?= base_url('inc/about.php') ?>" class="<?= ($current_page == 'about.php') ? 'active' : ''; ?>">About Us</a>
+    <a href="<?= base_url('inc/account.php') ?>" class="<?= ($current_page == 'account.php') ? 'active' : ''; ?>">Account</a>
+    <a href="<?= base_url('inc/register.php') ?>" class="<?= ($current_page == 'register.php') ? 'active' : ''; ?>">Register</a>
 </nav>

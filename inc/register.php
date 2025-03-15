@@ -4,16 +4,16 @@
 
 <?php
 
-$host = "localhost";
-$user = "inf1005-sqldev";
-$pass = "r2Qr3YjS";
-$dbname = "daruma_db";
+// $host = "localhost";
+// $user = "inf1005-sqldev";
+// $pass = "r2Qr3YjS";
+// $dbname = "daruma_db";
 
-$conn = new mysqli($host, $user, $pass, $dbname);
+// $conn = new mysqli($host, $user, $pass, $dbname);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// if ($conn->connect_error) {
+//     die("Connection failed: " . $conn->connect_error);
+// }
 
 $errors = [];
 $success = false;
@@ -38,9 +38,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $full_name = trim($fname . ' ' . $lname);
 
-        $stmt = $conn->prepare("INSERT INTO members (fname, lname, email, password) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $fname, $lname, $email, $hashed_password);
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $full_name, $email, $hashed_password);
 
         if ($stmt->execute()) {
             $success = true;
@@ -54,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $stmt->close();
     }
+
 }
 
 $conn->close();
@@ -61,11 +63,11 @@ $conn->close();
 
 <div class="container">
     <?php if ($success): ?>
-        <h1>Registration Successful!</h1>
-        <p>Registration Successful. You can now <a href="account.php" class="login-link">log in</a>.</p>
+        <h1 class="text-center">Registration Successful!</h1>
+        <p class="text-center">Registration Successful. You can now <a href="account.php" class="login-link">log in</a>.</p>
     <?php else: ?>
-        <h1>Create Your Account</h1>
-        <p>Register now and enjoy exclusive promotions.</p>
+        <h1 class="text-center">Create Your Account</h1>
+        <p class="text-center">Register now and enjoy exclusive promotions.</p>
 
         <?php if (!empty($errors)): ?>
             <ul class="error-message">

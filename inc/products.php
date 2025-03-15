@@ -1,30 +1,30 @@
 <?php 
-include("../inc/design/head.php");
-include("../inc/design/header.php");
-include("../inc/design/nav.php");
+    include("../inc/design/head.php");
+    include("../inc/design/header.php");
+    include("../inc/design/nav.php");
 
-/* Set default values */
-$productsPerPage = 12; 
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $productsPerPage;
-$minPrice = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
-$maxPrice = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 10000;
+    /* Set default values */
+    $productsPerPage = 12; 
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $offset = ($page - 1) * $productsPerPage;
+    $minPrice = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
+    $maxPrice = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 10000;
 
-/* Query to get total number of products with price filtering */
-$totalStmt = $conn->prepare("SELECT COUNT(id) AS total FROM products WHERE price BETWEEN ? AND ?");
-$totalStmt->bind_param("ii", $minPrice, $maxPrice);
-$totalStmt->execute();
-$totalResult = $totalStmt->get_result();
-$totalRow = $totalResult->fetch_assoc();
-$totalProducts = $totalRow['total'];
-$totalPages = ceil($totalProducts / $productsPerPage);
-$totalStmt->close();
+    /* Query to get total number of products with price filtering */
+    $totalStmt = $conn->prepare("SELECT COUNT(id) AS total FROM products WHERE price BETWEEN ? AND ?");
+    $totalStmt->bind_param("ii", $minPrice, $maxPrice);
+    $totalStmt->execute();
+    $totalResult = $totalStmt->get_result();
+    $totalRow = $totalResult->fetch_assoc();
+    $totalProducts = $totalRow['total'];
+    $totalPages = ceil($totalProducts / $productsPerPage);
+    $totalStmt->close();
 
-/* Query to retrieve products by page with price filtering */
-$stmt = $conn->prepare("SELECT id, name, edition, price, image FROM products WHERE price BETWEEN ? AND ? ORDER BY created_at DESC LIMIT ? OFFSET ?");
-$stmt->bind_param("iiii", $minPrice, $maxPrice, $productsPerPage, $offset);
-$stmt->execute();
-$result = $stmt->get_result();
+    /* Query to retrieve products by page with price filtering */
+    $stmt = $conn->prepare("SELECT id, name, edition, price, image FROM products WHERE price BETWEEN ? AND ? ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param("iiii", $minPrice, $maxPrice, $productsPerPage, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
 ?>
 
 <div class="container">

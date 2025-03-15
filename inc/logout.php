@@ -1,22 +1,22 @@
 <?php
-session_start();
+    session_start();
 
-// Unset all session variables
-$_SESSION = array();
+    // Unset all session variables
+    $_SESSION = array();
 
-// If desired, destroy the session cookie as well
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
-    );
-}
+    // If desired, destroy the session cookie as well
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
 
-// Destroy the session
-session_destroy();
+    // Destroy the session
+    session_destroy();
 
-// Redirect to the account page (or home page)
-header("Location: account.php");
-exit();
+    // Redirect to the account page (or home page)
+    header("Location: account.php");
+    exit();
 ?>

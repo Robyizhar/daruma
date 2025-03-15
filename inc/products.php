@@ -2,29 +2,35 @@
     include("../inc/design/head.php");
     include("../inc/design/header.php");
     include("../inc/design/nav.php");
+    include("./sql/db.php");
 
     /* Set default values */
-    $productsPerPage = 12; 
+    $productModel = new ProductModel($conn);
+
+    $productsPerPage = 12;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $productsPerPage;
-    $minPrice = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
-    $maxPrice = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 10000;
 
-    /* Query to get total number of products with price filtering */
-    $totalStmt = $conn->prepare("SELECT COUNT(id) AS total FROM products WHERE price BETWEEN ? AND ?");
-    $totalStmt->bind_param("ii", $minPrice, $maxPrice);
-    $totalStmt->execute();
-    $totalResult = $totalStmt->get_result();
-    $totalRow = $totalResult->fetch_assoc();
-    $totalProducts = $totalRow['total'];
+    $minPrice_formatted = isset($_GET['min_price']) ? $_GET['min_price'] : '$ 0';
+    $maxPrice_formatted = isset($_GET['max_price']) ? $_GET['max_price'] : '$ 1.000';
+    
+    /* Make sure the price input is only numbers */
+    $minPrice = isset($_GET['min_price']) ? (int) preg_replace("/[^0-9]/", "", $_GET['min_price']) : 0;
+    $maxPrice = isset($_GET['max_price']) ? (int) preg_replace("/[^0-9]/", "", $_GET['max_price']) : 10000;
+    
+    /* Make sure minPrice is not greater than maxPrice */
+    if ($minPrice > $maxPrice) {
+        $temp = $minPrice;
+        $minPrice = $maxPrice;
+        $maxPrice = $temp;
+    }
+    
+    /* Get total products based on price range */
+    $totalProducts = $productModel->getTotalProductsByPrice($minPrice, $maxPrice);
     $totalPages = ceil($totalProducts / $productsPerPage);
-    $totalStmt->close();
-
-    /* Query to retrieve products by page with price filtering */
-    $stmt = $conn->prepare("SELECT id, name, edition, price, image FROM products WHERE price BETWEEN ? AND ? ORDER BY created_at DESC LIMIT ? OFFSET ?");
-    $stmt->bind_param("iiii", $minPrice, $maxPrice, $productsPerPage, $offset);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    
+    /* Retrieve product data based on price filter */
+    $result = $productModel->getProductsByPrice($minPrice, $maxPrice, $productsPerPage, $offset);
 ?>
 
 <div class="container">
@@ -37,11 +43,11 @@
             <div class="row g-3 align-items-end">
                 <div class="col-12 col-sm-12 col-md-4">
                     <label for="min_price" class="form-label" style="text-align: left;">Min Price</label>
-                    <input type="text" class="form-control" id="min_price" name="min_price" value="<?= $minPrice ?>" min="0">
+                    <input type="text" class="form-control number-filter" id="min_price" name="min_price" value="<?= $minPrice_formatted ?>">
                 </div>
                 <div class="col-12 col-sm-12 col-md-4">
                     <label for="max_price" class="form-label" style="text-align: left;">Max Price</label>
-                    <input type="text" class="form-control" id="max_price" name="max_price" value="<?= $maxPrice ?>" min="0">
+                    <input type="text" class="form-control number-filter" id="max_price" name="max_price" value="<?= $maxPrice_formatted ?>">
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-50 m-0">Apply Filter</button>
@@ -104,6 +110,5 @@
 </div>
 
 <?php 
-    $stmt->close();
     include("../inc/design/footer.php"); 
 ?>

@@ -183,6 +183,10 @@ nav a.active {
     }
 }
 
+.container-admin {
+    display: flex;
+}
+
 .form-container {
     width: 100%;
     max-width: 400px;
@@ -370,4 +374,26 @@ footer {
     font-size: 18px;
     color: white;
     font-weight: bold;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    min-height: 100vh;
+    padding: 15px;
+}
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+}
+.sidebar a:hover {
+    background-color: #495057;
+    border-radius: 5px;
+}
+.content {
+    flex-grow: 1;
+    padding: 20px;
 }

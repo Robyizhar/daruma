@@ -70,9 +70,9 @@ nav a.active {
     border-bottom: 2px solid rgb(255, 255, 255);
 }
 
-.container {
-    /* padding: 20px; */
+.text-center {
     text-align: center;
+
 }
 
 /* Hamburger Menu */
@@ -109,7 +109,7 @@ nav a.active {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* 3 per row */
     gap: 20px;
-    padding: 20px;
+    /* padding: 20px; */
     justify-content: center;
 }
 
@@ -202,13 +202,13 @@ nav a.active {
     width: 100%;
 }
 
-label {
+/* label {
     font-weight: bold;
     margin-bottom: 5px;
     color: white;
     text-align: center;
     width: 100%;
-}
+} */
 
 input {
     width: 80%; 

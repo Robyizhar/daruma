@@ -23,7 +23,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col text-center">
-            <h1>Welcome to Daruma!</h1>
+            <h1 class="text-center">Welcome to Daruma!</h1>
         </div>
     </div>
 </div>
@@ -31,7 +31,7 @@
 <div class="container mt-5 mb-5">
     <div class="row">
         <div class="col">
-            <h3>New Products</h3>
+            <h3 class="text-center">New Products</h3>
         </div>
     </div>
     <div class="row">
@@ -71,7 +71,7 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col">
-            <h3>Best Sellers</h3>
+            <h3 class="text-center">Best Sellers</h3>
         </div>
     </div>
     <div class="row">
@@ -111,9 +111,9 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col">
-            <h3>News</h3>
-            <p>Apple launches new line of flagship phones in March</p>
-            <p>New Apple stock available at our online store</p>
+            <h3 class="text-center">News</h3>
+            <p class="text-center">Apple launches new line of flagship phones in March</p>
+            <p class="text-center">New Apple stock available at our online store</p>
         </div>
     </div>
 </div>

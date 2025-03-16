@@ -8,7 +8,12 @@
         exit();
     }
 
+    $page_type = isset($_GET['list']) ? $_GET['list'] : '';
     $Model = new Model();
+    $orders = [];
+    if ($page_type == 'orders') {
+        $orders = $Model->getOrders($_SESSION['user_id']);
+    }
 
     /* Pagination */
     $productsPerPage = 10;
@@ -40,11 +45,55 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h4>Admin Panel</h4>
-        <a class="<?= ($current_page == 'admin.php') ? 'bg-dark' : ''; ?>" href="<?= base_url('inc/admin.php') ?>">List Product</a>
-        <a class="<?= ($current_page == 'orders.php') ? 'bg-dark' : ''; ?>" href="#">List Orders</a>
+        <a class="<?= ($page_type == 'product' || $page_type == '') ? 'bg-dark' : ''; ?>" href="<?= base_url('inc/admin.php?list=product') ?>">List Product</a>
+        <a class="<?= ($page_type == 'orders') ? 'bg-dark' : ''; ?>" href="<?= base_url('inc/admin.php?list=orders') ?>">List Orders</a>
     </div>
 
     <!-- Main Content -->
+    <?php if($page_type == 'orders'): ?>
+    <div class="content">
+        <div class="container mt-5">
+            <h2 class="mb-4">My Order List</h2>
+            <?php if (count($orders) > 0): ?>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Recipient</th>
+                                <th>Address</th>
+                                <th>Phone</th>
+                                <th>Total Price</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($orders as $row): ?>
+                                <tr>
+                                    <td class="text-white">#<?= htmlspecialchars($row['id']) ?></td>
+                                    <td class="text-white"><?= htmlspecialchars($row['received_name']) ?></td>
+                                    <td class="text-white"><?= htmlspecialchars($row['shipping_address']) ?></td>
+                                    <td class="text-white"><?= htmlspecialchars($row['phone_number']) ?></td>
+                                    <td class="text-white">Rp <?= number_format($row['total_price'], 0, ',', '.') ?></td>
+                                    <td class="text-white">
+                                        <span class="badge bg-<?= $row['status'] == 'pending' ? 'warning' : ($row['status'] == 'delivered' ? 'success' : 'danger') ?>">
+                                            <?= htmlspecialchars($row['status']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-white"><?= date('M d Y, H:i', strtotime($row['created_at'])) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <div class="alert alert-info">You don't have any orders yet.</div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+    <?php else: ?>
     <div class="content">
         <h2 class="text-center">Manage Products</h2>
         
@@ -101,6 +150,8 @@
             </ul>
         </nav>
     </div>
+    <?php endif; ?>
+
 </div>
 
 <div class="modal fade" id="add-modal" tabindex="-1">

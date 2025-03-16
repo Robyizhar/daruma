@@ -66,7 +66,10 @@
         
     <?php else: ?>
         <h1>Welcome, <?php echo htmlspecialchars($_SESSION['fname']); ?>!</h1>
-        <p>You are now logged in. Here you can view your account details and order history.</p>
+        <p>
+            You are now logged in. Here you can view your account details and order history. 
+            You can access the admin page as <a href="<?= base_url('inc/admin.php') ?>">Administrator</a>.
+        </p>
         <!-- Replace the line below with your actual order and account details -->
         <div class="container mt-5">
             <h2 class="mb-4">My Order List</h2>
@@ -93,7 +96,7 @@
                                     <td class="text-white"><?= htmlspecialchars($row['phone_number']) ?></td>
                                     <td class="text-white">Rp <?= number_format($row['total_price'], 0, ',', '.') ?></td>
                                     <td class="text-white">
-                                        <span class="badge bg-<?= $row['status'] == 'Pending' ? 'warning' : ($row['status'] == 'Completed' ? 'success' : 'danger') ?>">
+                                        <span class="badge bg-<?= $row['status'] == 'pending' ? 'warning' : ($row['status'] == 'delivered' ? 'success' : 'danger') ?>">
                                             <?= htmlspecialchars($row['status']) ?>
                                         </span>
                                     </td>

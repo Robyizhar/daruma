@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("./sql/db.php");
+include("./config/send_email.php");
 $Model = new Model();
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -27,6 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             echo json_encode(["success" => false, "message" => "Invalid input", "error" => $response]);
         }
+    } else if ($type == 'send_email') {
+        $email = $_POST['user_email'];
+        $name = $_POST['user_name'];
+        $subject = "Your Order Has Been Confirmed";
+        $body = "<h3>Hallo $name,</h3><p>Your order is being processed. Thank you for shopping at our store!</p>";
+        // Send email
+        echo sendEmail($email, $name, $subject, $body);
     }
 }
 

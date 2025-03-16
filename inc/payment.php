@@ -56,6 +56,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+    const user_name = "<?= $_SESSION['fname'] ?>";
+    const user_email = "<?= $_SESSION['femail'] ?>";
+
     $(document).ready(function() {
         $("#payment-form").submit(function(e) {
             e.preventDefault();
@@ -75,6 +79,9 @@
                     success: function(response) {
                         const res = typeof response === 'string' ? JSON.parse(response) : response;
                         if (res.success) {
+                            setTimeout(() => {
+                                sendEmail(user_name, user_email)
+                            }, 2000);
                             $("#payment-processing").addClass("d-none");
                             $("#payment-success").removeClass("d-none");
                             updateCartCount(0);
@@ -95,4 +102,23 @@
             }, 5000);
         });
     });
+
+    function sendEmail(user_name, user_email) {
+        $.ajax({
+            url: "order.php",
+            type: "POST",
+            data: {
+                user_name: user_name,
+                user_email: user_email,
+                type: 'send_email'
+            },
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    }
+
 </script>

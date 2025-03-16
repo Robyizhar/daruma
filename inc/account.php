@@ -7,6 +7,7 @@
 
     $Model = new Model();
     // Check if the user is already logged in
+    $orders = [];
     if (!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_submit'])) {
         $email = trim($_POST['email']);
         $password = trim($_POST['password']);
@@ -31,7 +32,7 @@
                 $error = "No account found with that email.";
             }
         }
-    } else {
+    } else if(isset($_SESSION['user_id'])) {
         $orders = $Model->getOrders($_SESSION['user_id']);
     }
 ?>

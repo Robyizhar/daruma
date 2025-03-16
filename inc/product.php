@@ -71,20 +71,18 @@
                 success: function(response) {
                     if(response.success) {
                         Swal.fire({ title: "Success!", text: response.message, icon: "success", timer: 2000, showConfirmButton: true }).then(() => {
-                            $("#add-modal").modal("hide");
                             updateCartCount(response.data.length);
                         });
                     } else {
                         Swal.fire({ title: "Failed!", text: response.message, icon: "warning", timer: 2000,   showConfirmButton: true }).then(() => {
-                            $("#add-modal").modal("hide");
+                            window.location.assign("account.php");
                         });
                     }
                 },
                 error: function(xhr, status, error) {
-                    Swal.fire({ title: "Failed!", text: "Failed to add cart!", icon: "error", showConfirmButton: true }).then(() => {
-                        $("#add-modal").modal("hide");
+                    Swal.fire({ title: "Failed!", text: xhr.responseText, icon: "error", showConfirmButton: true }).then(() => {
+                        location.reload();
                     });
-                    console.error(xhr.responseText);
                 }
             });
         });

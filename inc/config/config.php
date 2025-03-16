@@ -1,6 +1,6 @@
 <?php
     function base_url($path = '') {
-        return 'http://codingo_webapp.test/' . ltrim($path, '/');
+        return 'http://localhost/daruma/' . ltrim($path, '/');
     }
 
     /* Database Configuration */

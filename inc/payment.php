@@ -96,7 +96,9 @@
                         }
                     },
                     error: function() {
-                        alert("Payment failed. Please try again.");
+                        Swal.fire({ 
+                            title: "Error!", text: "Payment failed. Please try again.", icon: "error", showConfirmButton: true
+                        })
                     }
                 });
             }, 5000);

@@ -1,10 +1,57 @@
 <?php
 
-class ProductModel {
+class Model {
     private $conn;
 
     public function __construct($conn) {
         $this->conn = $conn;
+    }
+
+    public function getUserByEmail($email) {
+        $stmt = $this->conn->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
+        if ($stmt === false)
+            die("MySQL prepare error: " . $this->conn->error);
+
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->bind_result($user_id, $fname, $hashed_password, $role);
+        $stmt->fetch();
+
+        $user = ($user_id) ? ["id" => $user_id, "name" => $fname, "password" => $hashed_password, "role" => $role] : null;
+        $stmt->close();
+        return $user;
+    }
+
+    public function registerUser($fname, $lname, $email, $password) {
+        $full_name = trim($fname . ' ' . $lname);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    
+        $stmt = $this->conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+        if (!$stmt) {
+            return ["success" => false, "errors" => ["Database error: " . $this->conn->error]];
+        }
+    
+        $stmt->bind_param("sss", $full_name, $email, $hashed_password);
+        if ($stmt->execute()) {
+            $stmt->close();
+            return ["success" => true, "errors" => []];
+        } else {
+            $stmt->close();
+            return ["success" => false, "errors" => ($stmt->errno == 1062) ? ["Email already exists."] : ["Error: " . $stmt->error]];
+        }
+    }
+
+    public function getProductById($id) {
+        $stmt = $this->conn->prepare("SELECT id, name, edition, price, description, image FROM products WHERE id = ?");
+        if (!$stmt) {
+            return null;
+        }
+    
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        return $result->fetch_assoc();
     }
 
     // Get the total number of products based on price range

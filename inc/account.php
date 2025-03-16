@@ -3,40 +3,32 @@
     include("../inc/design/head.php"); 
     include("../inc/design/header.php"); 
     include("../inc/design/nav.php"); 
+    include("./sql/db.php");
+
+    $Model = new Model($conn);
 
     // Check if the user is already logged in
-    if (!isset($_SESSION['user_id'])) {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_submit'])) {
-            $email = trim($_POST['email']);
-            $password = trim($_POST['password']);
-
-            if (empty($email) || empty($password)) {
-                $error = "Please enter both email and password.";
-            } else {
-                $stmt = $conn->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
-
-                if ($stmt === false)
-                    die("MySQL prepare error: " . $conn->error);
-
-                $stmt->bind_param("s", $email);
-                $stmt->execute();
-                $stmt->bind_result($user_id, $fname, $hashed_password, $role);
-                $stmt->fetch();
-
-                if ($user_id) {
-                    if (password_verify($password, $hashed_password)) {
-                        $_SESSION['user_id'] = $user_id;
-                        $_SESSION['fname'] = $fname;
-                        $_SESSION['role'] = $role;
-                        header("Location: account.php");
-                        exit();
-                    } else {
-                        $error = "Incorrect password.";
-                    }
+    if (!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_submit'])) {
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
+    
+        if (empty($email) || empty($password)) {
+            $error = "Please enter both email and password.";
+        } else {
+            $user = $Model->getUserByEmail($email);
+    
+            if ($user) {
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['fname'] = $user['name'];
+                    $_SESSION['role'] = $user['role'];
+                    header("Location: account.php");
+                    exit();
                 } else {
-                    $error = "No account found with that email.";
+                    $error = "Incorrect password.";
                 }
-                $stmt->close();
+            } else {
+                $error = "No account found with that email.";
             }
         }
     }

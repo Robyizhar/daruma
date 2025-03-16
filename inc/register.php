@@ -1,64 +1,40 @@
 <?php include("../inc/design/head.php"); ?>
 <?php include("../inc/design/header.php"); ?>
 <?php include("../inc/design/nav.php"); ?>
+<?php include("./sql/db.php"); ?>
 
 <?php
+    $Model = new Model($conn);
 
-// $host = "localhost";
-// $user = "inf1005-sqldev";
-// $pass = "r2Qr3YjS";
-// $dbname = "daruma_db";
+    $errors = [];
+    $success = false;
 
-// $conn = new mysqli($host, $user, $pass, $dbname);
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $fname = trim($_POST['fname']);
+        $lname = trim($_POST['lname']);
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
 
-// if ($conn->connect_error) {
-//     die("Connection failed: " . $conn->connect_error);
-// }
-
-$errors = [];
-$success = false;
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $fname = trim($_POST['fname']);
-    $lname = trim($_POST['lname']);
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
-
-    if (empty($lname)) {
-        $errors[] = "Last name is required.";
-    }
-    if (empty($email)) {
-        $errors[] = "Email is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
-    }
-    if (empty($password)) {
-        $errors[] = "Password is required.";
-    }
-
-    if (empty($errors)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $full_name = trim($fname . ' ' . $lname);
-
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $full_name, $email, $hashed_password);
-
-        if ($stmt->execute()) {
-            $success = true;
-        } else {
-            if ($stmt->errno == 1062) {
-                $errors[] = "Error: Email already exists.";
-            } else {
-                $errors[] = "Error: " . $stmt->error;
-            }
+        if (empty($lname)) {
+            $errors[] = "Last name is required.";
+        }
+        if (empty($email)) {
+            $errors[] = "Email is required.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format.";
+        }
+        if (empty($password)) {
+            $errors[] = "Password is required.";
         }
 
-        $stmt->close();
+        if (empty($errors)) {
+            $result = $Model->registerUser($fname, $lname, $email, $password);
+            $success = $result['success'];
+            $errors = $result['errors'];
+        }
     }
 
-}
-
-$conn->close();
+    $conn->close();
 ?>
 
 <div class="container">

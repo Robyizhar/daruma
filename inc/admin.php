@@ -11,7 +11,7 @@
         exit();
     }
 
-    $productModel = new ProductModel($conn);
+    $productModel = new Model($conn);
 
     /* Pagination */
     $productsPerPage = 10;
@@ -72,7 +72,6 @@
                         <td class="text-white"><?= htmlspecialchars($row['description']) ?></td>
                         <td class="text-white">$<?= number_format($row['price'], 2) ?></td>
                         <td class="text-white"><img src="<?= base_url(htmlspecialchars($row['image'])) ?>" width="50"></td>
-
                         <td class="text-white">
                             <button class="btn btn-warning btn-sm edit-btn">Edit</button>
                             <button class="btn btn-danger btn-sm delete-btn">Delete</button>

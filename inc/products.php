@@ -5,18 +5,18 @@
     include("./sql/db.php");
 
     /* Set default values */
-    $productModel = new ProductModel($conn);
+    $productModel = new Model($conn);
 
     $productsPerPage = 12;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $productsPerPage;
 
     $minPrice_formatted = isset($_GET['min_price']) ? $_GET['min_price'] : '$ 0';
-    $maxPrice_formatted = isset($_GET['max_price']) ? $_GET['max_price'] : '$ 1.000';
+    $maxPrice_formatted = isset($_GET['max_price']) ? $_GET['max_price'] : '$ 1.000.000.000';
     
     /* Make sure the price input is only numbers */
     $minPrice = isset($_GET['min_price']) ? (int) preg_replace("/[^0-9]/", "", $_GET['min_price']) : 0;
-    $maxPrice = isset($_GET['max_price']) ? (int) preg_replace("/[^0-9]/", "", $_GET['max_price']) : 10000;
+    $maxPrice = isset($_GET['max_price']) ? (int) preg_replace("/[^0-9]/", "", $_GET['max_price']) : 10000000;
     
     /* Make sure minPrice is not greater than maxPrice */
     if ($minPrice > $maxPrice) {

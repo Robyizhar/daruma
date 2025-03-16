@@ -16,14 +16,14 @@
             $response["data"] = null;
         
             if ($id > 0 && !empty($name) && !empty($description) && !empty($edition) && $price > 0) {
-                // Handle file upload jika ada file
+                /* Handle file upload */
                 if (!empty($_FILES["image"]["name"])) {
                     $targetDir = "../images/products/";
-                    $fileName = time() . "_" . basename($_FILES["image"]["name"]); // timestamp for unique name
+                    $fileName = time() . "_" . basename($_FILES["image"]["name"]); /* timestamp for unique name */
                     $targetFilePath = $targetDir . $fileName;
                     $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
         
-                    // Allowed format
+                    /* Allowed format */
                     $allowedTypes = ["jpg", "jpeg", "png", "gif", "webp"];
                     if (in_array($fileType, $allowedTypes)) {
                         if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFilePath)) {
@@ -39,7 +39,7 @@
                         exit;
                     }
                 }
-                $productModel = new ProductModel($conn);
+                $productModel = new Model($conn);
                 $query = $productModel->updateProduct($id, $name, $description, $edition, $price, $imagePath); /* Update produk di database */
         
                 if ($query) {

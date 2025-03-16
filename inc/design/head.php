@@ -13,9 +13,11 @@
 
     <link href="<?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url('css/styles.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/fontawesome-free-5.15.4-web/css/all.min.css') ?>">
 
     <script src="<?= base_url('js/jquery-3.7.1.min.js') ?>"></script>
     <script src="<?= base_url('js/bootstrap.bundle.js') ?>"></script>
+    <script src="<?= base_url('css/fontawesome-free-5.15.4-web/js/all.min.js') ?>"></script>
     <script defer src="<?= base_url('js/script.js') ?>"></script>
 </head>
 <body>

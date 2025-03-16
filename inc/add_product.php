@@ -15,14 +15,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $response["data"] = null;
 
     if (!empty($name) && !empty($description) && !empty($edition) && $price > 0) {
-        // Handle file upload jika ada file
+        /* Handle file upload */
         if (!empty($_FILES["image"]["name"])) {
             $targetDir = "../images/products/";
             $fileName = time() . "_" . basename($_FILES["image"]["name"]);
             $targetFilePath = $targetDir . $fileName;
             $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
 
-            // Hanya izinkan format gambar tertentu
+            /* Allowed format */
             $allowedTypes = ["jpg", "jpeg", "png", "gif", "webp"];
             if (in_array($fileType, $allowedTypes)) {
                 if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFilePath)) {
@@ -39,8 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        $productModel = new ProductModel($conn);
-        $query = $productModel->addProduct($name, $description, $edition, $price, $imagePath); /* Insert produk di database */
+        $productModel = new Model($conn);
+        $query = $productModel->addProduct($name, $description, $edition, $price, $imagePath); /* Insert produk in to database */
 
         if ($query) {
             $response["success"] = true;

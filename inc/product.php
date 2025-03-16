@@ -1,26 +1,23 @@
 <?php include("../inc/design/head.php"); ?>
 <?php include("../inc/design/header.php"); ?>
 <?php include("../inc/design/nav.php"); ?>
+<?php include("./sql/db.php"); ?>
 
 <?php
-    // Get product ID from the query string and sanitize it
-    $id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : '';
-    // Query the product details based on the provided product_id
-    // $query = "SELECT product_id, product_name, edition, price, description, product_image FROM products WHERE product_id = '$id'";
-    $stmt = $conn->prepare("SELECT id, name, edition, price, description, image FROM products WHERE id = ?");
-    $stmt->bind_param("i", $id); // "i" berarti integer
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && mysqli_num_rows($result) > 0) {
-        $product = mysqli_fetch_assoc($result);
-    } else {
-        echo "<p>Product not found.</p>";
+    $Model = new Model($conn);
+
+    // Make sure ID valid
+    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    if ($id <= 0) {
+        header("Location: products.php");
         exit;
     }
+    $product = $Model->getProductById($id);    
 ?>
 
 <div class="container">
     <div class="product-description" style="overflow:auto; margin: 20px 0;">
+        <?php if($product): ?>
         <!-- Left column: Product image -->
         <div class="product-image" style="float: left; width: 40%; text-align: center;">
             <!-- Since the images haven't been added yet, we use a placeholder -->
@@ -34,6 +31,9 @@
             <p class="description"><?= nl2br(htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8')); ?></p>
             <button class="add-to-cart">Add to Cart</button>
         </div>
+        <?php else: ?>
+        <div><p>The product you are looking for is no longer available or has recently been removed.</p></div>
+        <?php endif; ?>
         <div style="clear:both;"></div>
     </div>
 </div>

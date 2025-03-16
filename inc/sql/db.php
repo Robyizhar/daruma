@@ -79,9 +79,9 @@ class Model {
             foreach ($carts as $item) {
                 $total_price += $item['price'] * $item['quantity'];
             }
-
-            $order_stmt = $this->conn->prepare("INSERT INTO orders (user_id, received_name, shipping_address, phone_number, total_price, status, created_at) VALUES (?, ?, ?, ?, ?, 'Pending', NOW())");
-            $order_stmt->bind_param("isssd", $user_id, $name, $shipping_address, $phone, $total_price );
+            
+            $order_stmt = $this->conn->prepare("INSERT INTO orders (user_id, received_name, shipping_address, phone_number, total_price, cc_number, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'Pending', NOW())");
+            $order_stmt->bind_param("isssds", $user_id, $received_name, $shipping_address, $phone_number, $total_price, $cc_number);
 
             $order_stmt->execute();
             $order_id = $order_stmt->insert_id;
@@ -109,19 +109,25 @@ class Model {
         }
     }
 
-    public function getOrders() {
+    public function getOrders($user_id) {
         $query = "SELECT id, received_name, shipping_address, phone_number, total_price, status, created_at 
             FROM orders 
             WHERE user_id = ? 
             ORDER BY created_at 
         DESC";
 
-        $stmt = $conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
+        $orders = [];
+    
+        while ($row = $result->fetch_assoc()) {
+            $orders[] = $row;
+        }
+    
         $stmt->close();
-        return $result->fetch_assoc();
+        return $orders;
     }
 
     public function getUserByEmail($email) {

@@ -73,7 +73,7 @@
                 <?php 
                     $index++;
                     $all_quantities += $row['quantity'];
-                    $all_prices += $row['quantity'] * $row['price']; // Perbaikan total harga
+                    $all_prices += $row['quantity'] * $row['price'];
                 ?>
                 <?php endforeach; ?>
                 <tr class="table-dark">

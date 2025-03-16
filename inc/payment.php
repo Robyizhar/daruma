@@ -58,9 +58,9 @@
     </div>
     <?php endif; ?>
 </div>
-    
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
     $(document).ready(function() {
         $("#payment-form").submit(function(e) {
             e.preventDefault();
@@ -78,9 +78,20 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
-                        $("#payment-processing").addClass("d-none");
-                        $("#payment-success").removeClass("d-none");
-                        updateCartCount(0);
+                        const res = typeof response === 'string' ? JSON.parse(response) : response;
+                        if (res.success) {
+                            $("#payment-processing").addClass("d-none");
+                            $("#payment-success").removeClass("d-none");
+                            updateCartCount(0);
+                        } else {
+                            Swal.fire({ 
+                                title: "Warning!", text: res.message, icon: "warning", showConfirmButton: true
+                            }).then(() => {
+                                $("#payment-form").show();
+                                $(".title-payment").show();
+                                $("#payment-processing").addClass("d-none"); 
+                            });
+                        }
                     },
                     error: function() {
                         alert("Payment failed. Please try again.");

@@ -1,10 +1,7 @@
-<?php include("../inc/design/head.php"); ?>
-<?php include("../inc/design/header.php"); ?>
-<?php include("../inc/design/nav.php"); ?>
 <?php include("./sql/db.php"); ?>
 
 <?php
-
+    session_start();
     /* Make sure ID valid */
     $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     if ($id <= 0) {
@@ -31,7 +28,13 @@
         }
     }
     /* Insert To Cart */
+
+    include("../inc/design/head.php");
+    include("../inc/design/header.php");
+    include("../inc/design/nav.php");
 ?>
+
+
 
 <div class="container">
     <div class="product-description" style="overflow:auto; margin: 20px 0;">
@@ -85,39 +88,20 @@
             dataType: "json",
             success: function(response) {
                 if(response.success) {
-                    // alert("Produk berhasil ditambahkan ke keranjang!");
-                    Swal.fire({
-                        title: "Success!",
-                        text: res.message,
-                        icon: "success",
-                        timer: 2000,  
-                        showConfirmButton: true
-                    }).then(() => {
+                    Swal.fire({ title: "Success!", text: response.message, icon: "success", timer: 2000, showConfirmButton: true }).then(() => {
                         $("#add-modal").modal("hide");
-                        location.reload();  
+                        updateCartCount(response.data.length);
+                        // location.reload();
                     });
                 } else {
-                    Swal.fire({
-                        title: "Failed!",
-                        text: res.message,
-                        icon: "warning",
-                        timer: 2000,  
-                        showConfirmButton: true
-                    }).then(() => {
+                    Swal.fire({ title: "Failed!", text: response.message, icon: "warning", timer: 2000,   showConfirmButton: true }).then(() => {
                         $("#add-modal").modal("hide");
-                        location.reload();
+                        // location.reload();
                     });
-                    // alert("Gagal menambahkan produk ke keranjang.");
                 }
             },
             error: function(xhr, status, error) {
-                Swal.fire({
-                    title: "Failed!",
-                    text: "Failed to add cart!",
-                    icon: "error",
-                    timer: 2000,  
-                    showConfirmButton: true
-                }).then(() => {
+                Swal.fire({ title: "Failed!", text: "Failed to add cart!", icon: "error", showConfirmButton: true }).then(() => {
                     $("#add-modal").modal("hide");
                     // location.reload();
                 });

@@ -1,6 +1,10 @@
-<?php include("../inc/design/head.php"); ?>
-<?php include("../inc/design/header.php"); ?>
-<?php include("../inc/design/nav.php"); ?>
+<?php 
+    include("../inc/design/head.php"); 
+    include("../inc/design/header.php"); 
+    include("../inc/design/nav.php"); 
+    session_start(); 
+    include("./sql/db.php");
+?>
 
 <div class="container">
     <h1>About Us</h1>

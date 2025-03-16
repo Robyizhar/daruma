@@ -1,8 +1,5 @@
 <?php
     session_start();
-    include("../inc/design/head.php"); 
-    include("../inc/design/header.php"); 
-    include("../inc/design/nav.php"); 
     include("./sql/db.php");
 
     /* Check if the user is logged in as admin */
@@ -32,6 +29,10 @@
         exit();
     }
     $current_page = basename($_SERVER['PHP_SELF']);
+
+    include("../inc/design/head.php"); 
+    include("../inc/design/header.php"); 
+    include("../inc/design/nav.php"); 
 
 ?>
 
@@ -174,23 +175,15 @@
                     const res = typeof response === 'string' ? JSON.parse(response) : response;
                     if (res.success) {
                         $("#add-modal").removeClass("show");
-                        Swal.fire({
-                            title: "Success!",
-                            text: res.message,
-                            icon: "success",
-                            timer: 2000,  
-                            showConfirmButton: true
+                        Swal.fire({ 
+                            title: "Success!", text: res.message, icon: "success", timer: 2000,   showConfirmButton: true
                         }).then(() => {
                             $("#add-modal").modal("hide");
                             location.reload();  
                         });
                     } else {
-                        Swal.fire({
-                            title: "Failed!",
-                            text: res.message,
-                            icon: "warning",
-                            timer: 2000,  
-                            showConfirmButton: true
+                        Swal.fire({ 
+                            title: "Failed!", text: res.message, icon: "warning", timer: 2000,   showConfirmButton: true
                         }).then(() => {
                             $("#add-modal").modal("hide");
                             location.reload();
@@ -198,11 +191,8 @@
                     }
                 },
                 error: function () {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Failed to Add product.",
-                        icon: "error",
-                        confirmButtonText: "OK"
+                    Swal.fire({ 
+                        title: "Error!", text: "Failed to Add product.", icon: "error", confirmButtonText: "OK"
                     });
                 }
             });
@@ -243,23 +233,15 @@
                     const res = typeof response === 'string' ? JSON.parse(response) : response;
                     if (res.success) {
                         $("#edit-modal").removeClass("show");
-                        Swal.fire({
-                            title: "Success!",
-                            text: res.message,
-                            icon: "success",
-                            timer: 2000,  
-                            showConfirmButton: true
+                        Swal.fire({ 
+                            title: "Success!", text: res.message, icon: "success", timer: 2000, showConfirmButton: true
                         }).then(() => {
                             $("#edit-modal").modal("hide");
                             location.reload();  
                         });
                     } else {
-                        Swal.fire({
-                            title: "Failed!",
-                            text: res.message,
-                            icon: "warning",
-                            timer: 2000,  
-                            showConfirmButton: true
+                        Swal.fire({ 
+                            title: "Failed!", text: res.message, icon: "warning", timer: 2000,   showConfirmButton: true
                         }).then(() => {
                             $("#edit-modal").modal("hide");
                             location.reload();  
@@ -267,14 +249,12 @@
                     }
                 },
                 error: function () {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Failed to update product.",
-                        icon: "error",
-                        confirmButtonText: "OK"
+                    Swal.fire({ 
+                        title: "Error!", text: "Failed to update product.", icon: "error", confirmButtonText: "OK"
                     });
                 }
             });
         });
     });
 </script>
+<?php include("../inc/design/footer.php"); ?>

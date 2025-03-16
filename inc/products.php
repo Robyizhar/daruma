@@ -3,7 +3,8 @@
     include("../inc/design/header.php");
     include("../inc/design/nav.php");
     include("./sql/db.php");
-
+    session_start();
+    
     /* Set default values */
     $Model = new Model();
 

@@ -10,9 +10,7 @@ class Model {
             'db_pass' => '',
             'db_name' => 'daruma_db',
         ];
-    
         $conn = new mysqli($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
-    
         if ($conn->connect_error) 
             die("Koneksi gagal: " . $conn->connect_error);
     
@@ -20,16 +18,55 @@ class Model {
     }
 
     public function addToCart($user_id, $product_id, $quantity) {
-    
-        $stmt = $this->conn->prepare("INSERT INTO cart (user_id, product_id, quantity, added_at) 
-                                VALUES (?, ?, ?, NOW()) 
-                                ON DUPLICATE KEY UPDATE quantity = quantity + ?, added_at = NOW()");
-        $stmt->bind_param("iiii", $user_id, $product_id, $quantity, $quantity);
+        /* Check if the product is already in the user's cart */
+        $stmt = $this->conn->prepare("SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?");
+        $stmt->bind_param("ii", $user_id, $product_id);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            /* If it already exists, update quantity and added_at */
+            $stmt->close();
+            $stmt = $this->conn->prepare("UPDATE cart SET quantity = quantity + ?, added_at = NOW() WHERE user_id = ? AND product_id = ?");
+            $stmt->bind_param("iii", $quantity, $user_id, $product_id);
+        } else {
+            /* If not, enter new data */
+            $stmt->close();
+            $stmt = $this->conn->prepare("INSERT INTO cart (user_id, product_id, quantity, added_at) VALUES (?, ?, ?, NOW())");
+            $stmt->bind_param("iii", $user_id, $product_id, $quantity);
+        }
+
         $result = $stmt->execute();
         $stmt->close();
-    
-        return $result;
+
+        if ($result) {
+            return $this->getCartByUser($user_id);
+        } else {
+            return false;
+        }
+
+        // Get updated cart
     }
+
+    public function getCartByUser($user_id) {
+        $stmt = $this->conn->prepare("SELECT c.id, c.product_id, p.name, p.price, c.quantity, c.added_at 
+            FROM cart c 
+            JOIN products p ON c.product_id = p.id 
+            WHERE c.user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        $cartItems = [];
+    
+        while ($row = $result->fetch_assoc()) {
+            $cartItems[] = $row;
+        }
+    
+        $stmt->close();
+        return $cartItems;
+    }
+    
 
     public function getUserByEmail($email) {
         $stmt = $this->conn->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
@@ -78,7 +115,7 @@ class Model {
         return $result->fetch_assoc();
     }
 
-    // Get the total number of products based on price range
+    /* Get the total number of products based on price range */
     public function getTotalProductsByPrice($minPrice, $maxPrice) {
         $stmt = $this->conn->prepare("SELECT COUNT(id) AS total FROM products WHERE price BETWEEN ? AND ?");
         $stmt->bind_param("ii", $minPrice, $maxPrice);
@@ -89,7 +126,7 @@ class Model {
         return $row['total'];
     }
 
-    // Get products based on price filters and pagination
+    /* Get products based on price filters and pagination */
     public function getProductsByPrice($minPrice, $maxPrice, $limit, $offset) {
         $stmt = $this->conn->prepare("SELECT id, name, edition, price, image FROM products WHERE price BETWEEN ? AND ? ORDER BY created_at DESC LIMIT ? OFFSET ?");
         $stmt->bind_param("iiii", $minPrice, $maxPrice, $limit, $offset);
@@ -98,13 +135,13 @@ class Model {
     }
     
 
-    // Get total products for pagination
+    /* Get total products for pagination */
     public function getTotalProducts() {
         $result = $this->conn->query("SELECT COUNT(*) as total FROM products");
         return $result->fetch_assoc()['total'];
     }
 
-    // Get product list with pagination
+    /* Get product list with pagination */
     public function getProducts($limit, $offset) {
         $stmt = $this->conn->prepare("SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?");
         $stmt->bind_param("ii", $limit, $offset);
@@ -112,7 +149,7 @@ class Model {
         return $stmt->get_result();
     }
 
-    // Add product
+    /* Add product */
     public function addProduct($name, $description, $edition, $price, $image = null) {
         if ($image != null) {
             $query = "INSERT INTO products (name, description, edition, price, image) VALUES (?, ?, ?, ?, ?)";
@@ -130,7 +167,7 @@ class Model {
         return false;
     }
 
-    // Edit produk
+    /* Edit produk */
     public function updateProduct($id, $name, $description, $edition, $price, $image = null) {
         if ($image != null) {
             $query = "UPDATE products SET name=?, description=?, edition=?, price=?, image=? WHERE id=?";
@@ -148,7 +185,7 @@ class Model {
         return false;
     }
 
-    // Delete product
+    /* Delete product */
     public function deleteProduct($id) {
         $stmt = $this->conn->prepare("DELETE FROM products WHERE id = ?");
         $stmt->bind_param("i", $id);

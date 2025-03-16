@@ -2,6 +2,7 @@
 <?php include("inc/design/header.php"); ?>
 <?php include("inc/design/nav.php"); ?>
 <?php include("inc/sql/db.php"); ?>
+<?php session_start(); ?>
 
 <style>
     .product-container {

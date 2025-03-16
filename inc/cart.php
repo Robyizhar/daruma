@@ -1,8 +1,5 @@
 <?php
     session_start();
-    include("../inc/design/head.php"); 
-    include("../inc/design/header.php"); 
-    include("../inc/design/nav.php"); 
     include("./sql/db.php");
     $Model = new Model();
 
@@ -15,9 +12,9 @@
         $insert = $Model->addToCart($user_id, $product_id, $quantity);
     
         if ($insert) {
-            echo json_encode(["success" => true]);
+            echo json_encode(["success" => true, "message" => "Product successfully added to cart!", "data" => $insert]);
         } else {
-            echo json_encode(["success" => false, "message" => "Gagal menambahkan ke keranjang"]);
+            echo json_encode(["success" => false, "message" => "Failed to add to cart!"]);
         }
         exit;
     }
@@ -27,6 +24,11 @@
         header("Location: account.php");
         exit;
     }
+
+    include("../inc/design/head.php"); 
+    include("../inc/design/header.php"); 
+    include("../inc/design/nav.php"); 
+    include("../inc/design/footer.php");
 
 
 ?>

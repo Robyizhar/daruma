@@ -23,5 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-
+function updateCartCount(count) {
+    if (count > 0) {
+        $("#cart-count").text(count).show();
+    } else {
+        $("#cart-count").hide();
+    }
+}

@@ -4,6 +4,7 @@
 <?php include("./sql/db.php"); ?>
 
 <?php
+    session_start();
     $Model = new Model();
 
     $errors = [];
@@ -34,7 +35,6 @@
         }
     }
 
-    $conn->close();
 ?>
 
 <div class="container">

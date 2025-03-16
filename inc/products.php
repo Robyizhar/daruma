@@ -63,7 +63,7 @@
                     $name = htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');
                     $edition = htmlspecialchars($row['edition'], ENT_QUOTES, 'UTF-8');
                     $price = number_format($row['price'], 2);
-                    $image = htmlspecialchars($row['image'], ENT_QUOTES, 'UTF-8');
+                    $image = $row['image'] ? htmlspecialchars($row['image'], ENT_QUOTES, 'UTF-8') : 'images/products/default_image.png';
                     $product_url = "product.php?id=" . $product_id;
                 ?>
                     <div class="product">

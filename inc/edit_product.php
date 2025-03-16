@@ -39,8 +39,8 @@
                         exit;
                     }
                 }
-                $productModel = new Model($conn);
-                $query = $productModel->updateProduct($id, $name, $description, $edition, $price, $imagePath); /* Update produk di database */
+                $Model = new Model();
+                $query = $Model->updateProduct($id, $name, $description, $edition, $price, $imagePath); /* Update produk di database */
         
                 if ($query) {
                     $response["success"] = true;

@@ -5,7 +5,7 @@
     include("./sql/db.php");
 
     /* Set default values */
-    $productModel = new Model($conn);
+    $Model = new Model();
 
     $productsPerPage = 12;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -26,11 +26,11 @@
     }
     
     /* Get total products based on price range */
-    $totalProducts = $productModel->getTotalProductsByPrice($minPrice, $maxPrice);
+    $totalProducts = $Model->getTotalProductsByPrice($minPrice, $maxPrice);
     $totalPages = ceil($totalProducts / $productsPerPage);
     
     /* Retrieve product data based on price filter */
-    $result = $productModel->getProductsByPrice($minPrice, $maxPrice, $productsPerPage, $offset);
+    $result = $Model->getProductsByPrice($minPrice, $maxPrice, $productsPerPage, $offset);
 ?>
 
 <div class="container">

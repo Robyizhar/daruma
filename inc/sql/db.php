@@ -3,8 +3,32 @@
 class Model {
     private $conn;
 
-    public function __construct($conn) {
+    public function __construct() {
+        $config = [
+            'db_host' => 'localhost',
+            'db_user' => 'root',
+            'db_pass' => '',
+            'db_name' => 'daruma_db',
+        ];
+    
+        $conn = new mysqli($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
+    
+        if ($conn->connect_error) 
+            die("Koneksi gagal: " . $conn->connect_error);
+    
         $this->conn = $conn;
+    }
+
+    public function addToCart($user_id, $product_id, $quantity) {
+    
+        $stmt = $this->conn->prepare("INSERT INTO cart (user_id, product_id, quantity, added_at) 
+                                VALUES (?, ?, ?, NOW()) 
+                                ON DUPLICATE KEY UPDATE quantity = quantity + ?, added_at = NOW()");
+        $stmt->bind_param("iiii", $user_id, $product_id, $quantity, $quantity);
+        $result = $stmt->execute();
+        $stmt->close();
+    
+        return $result;
     }
 
     public function getUserByEmail($email) {

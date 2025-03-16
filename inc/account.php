@@ -5,7 +5,7 @@
     include("../inc/design/nav.php"); 
     include("./sql/db.php");
 
-    $Model = new Model($conn);
+    $Model = new Model();
 
     // Check if the user is already logged in
     if (!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_submit'])) {
@@ -32,7 +32,6 @@
             }
         }
     }
-    $conn->close();
 ?>
 
 <div class="container">

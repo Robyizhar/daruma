@@ -39,8 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        $productModel = new Model($conn);
-        $query = $productModel->addProduct($name, $description, $edition, $price, $imagePath); /* Insert produk in to database */
+        $Model = new Model();
+        $query = $Model->addProduct($name, $description, $edition, $price, $imagePath); /* Insert produk in to database */
 
         if ($query) {
             $response["success"] = true;

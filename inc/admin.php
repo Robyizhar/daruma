@@ -11,20 +11,20 @@
         exit();
     }
 
-    $productModel = new Model($conn);
+    $Model = new Model();
 
     /* Pagination */
     $productsPerPage = 10;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $productsPerPage;
-    $totalProducts = $productModel->getTotalProducts();
+    $totalProducts = $Model->getTotalProducts();
     $totalPages = ceil($totalProducts / $productsPerPage);
-    $result = $productModel->getProducts($productsPerPage, $offset);
+    $result = $Model->getProducts($productsPerPage, $offset);
 
     /* Handle product delete requests */
     if (isset($_POST['delete_product'])) {
         $id = (int) $_POST['id'];
-        if ($productModel->deleteProduct($id)) {
+        if ($Model->deleteProduct($id)) {
             echo json_encode(["status" => "success"]);
         } else {
             echo json_encode(["status" => "error"]);

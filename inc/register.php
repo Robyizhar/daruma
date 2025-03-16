@@ -4,7 +4,7 @@
 <?php include("./sql/db.php"); ?>
 
 <?php
-    $Model = new Model($conn);
+    $Model = new Model();
 
     $errors = [];
     $success = false;

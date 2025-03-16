@@ -18,13 +18,13 @@
 
 <?php  
 
-    $productModel = new Model($conn);
+    $Model = new Model();
     $productsPerPage = 3;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $productsPerPage;
-    $totalProducts = $productModel->getTotalProducts();
+    $totalProducts = $Model->getTotalProducts();
     $totalPages = ceil($totalProducts / $productsPerPage);
-    $resultNewProducts = $productModel->getProducts($productsPerPage, $offset);
+    $resultNewProducts = $Model->getProducts($productsPerPage, $offset);
 
 ?>
 

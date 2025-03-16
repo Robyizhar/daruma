@@ -8,12 +8,6 @@
         exit;
     }
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $response = $Model->addOrders($_POST);
-        echo json_encode($response);
-        exit;
-    }
-
     $data_carts = $Model->getCartByUser($_SESSION['user_id']);
     $count_carts = count($data_carts);
 
@@ -38,6 +32,7 @@
         <input name="cc_number" type="text" class="form-control mb-2" placeholder="Credit Card Number (dummy)" required>
         <input type="text" name="phone_number" class="form-control mb-2" placeholder="Nomor HP" required>
         <input type="hidden" name="user_id" value="<?= $_SESSION['user_id'] ?>">
+        <input type="hidden" name="type" value="store_order">
         <button type="submit" class="btn btn-primary btn-lg w-100">Pay Now</button>
     </form>
 
@@ -72,7 +67,7 @@
 
             setTimeout(function() {
                 $.ajax({
-                    url: "payment.php",
+                    url: "order.php",
                     type: "POST",
                     data: formData,
                     contentType: false,

@@ -12,7 +12,7 @@
     $Model = new Model();
     $orders = [];
     if ($page_type == 'orders') {
-        $orders = $Model->getOrders($_SESSION['user_id']);
+        $orders = $Model->getOrders();
     }
 
     /* Pagination */
@@ -70,15 +70,26 @@
                         </thead>
                         <tbody>
                             <?php foreach ($orders as $row): ?>
-                                <tr>
+                                <tr style="cursor: pointer;" onclick="detailOrder(<?= $row['id'] ?>)">
                                     <td class="text-white">#<?= htmlspecialchars($row['id']) ?></td>
                                     <td class="text-white"><?= htmlspecialchars($row['received_name']) ?></td>
                                     <td class="text-white"><?= htmlspecialchars($row['shipping_address']) ?></td>
                                     <td class="text-white"><?= htmlspecialchars($row['phone_number']) ?></td>
                                     <td class="text-white">Rp <?= number_format($row['total_price'], 0, ',', '.') ?></td>
                                     <td class="text-white">
-                                        <span class="badge bg-<?= $row['status'] == 'pending' ? 'warning' : ($row['status'] == 'delivered' ? 'success' : 'danger') ?>">
-                                            <?= htmlspecialchars($row['status']) ?>
+                                        <?php
+                                            $status_colors = [
+                                                "pending" => "warning",
+                                                "shipped" => "primary",
+                                                "delivered" => "success",
+                                                "canceled" => "danger",
+                                                "processing" => "info"
+                                            ];
+
+                                            $badge_color = $status_colors[$row['status']] ?? 'secondary';
+                                        ?>
+                                        <span class="badge bg-<?= $badge_color ?>">
+                                            <?= htmlspecialchars(ucwords($row['status'])) ?>
                                         </span>
                                     </td>
                                     <td class="text-white"><?= date('M d Y, H:i', strtotime($row['created_at'])) ?></td>
@@ -203,6 +214,50 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-black" id="orderModalLabel">Detail Pesanan #<span id="order-id"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="text-black">Delivery Information</h6>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><strong>Recipient:</strong> <span id="received-name"></span></li>
+                    <li class="list-group-item"><strong>Address:</strong> <span id="shipping-address"></span></li>
+                    <li class="list-group-item"><strong>No. Cellphone:</strong> <span id="phone-number"></span></li>
+                    <li class="list-group-item"><strong>Total Price:</strong> Rp <span id="total-price"></span></li>
+                    <li class="list-group-item"><strong>Status:</strong> <span id="status"></span></li>
+                    <li class="list-group-item"><strong>Order Date:</strong> <span id="created-at"></span></li>
+                    <li class="list-group-item">
+                        <strong>Update Status:</strong><p class="text-danger">Select status to update order status</p>
+                        <select class="form-select" id="change-status" data-order="" aria-label="Default select example"></select>
+                    </li>
+                </ul>
+                <h6 class="text-black">Ordered Products</h6>
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-details">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
@@ -306,6 +361,105 @@
                 }
             });
         });
+
+        $(document).on('change', '#change-status', function (params) {
+            const selectedValue = $(this).val();
+            let orderId = $("#order-id").text();
+            $.ajax({
+                url: "order.php",
+                type: "POST",
+                data: { 
+                    order_id: orderId,
+                    status: selectedValue, 
+                    type: 'update_status'
+                },
+                success: function (response) {
+                    console.log('response', response);
+                    
+                    const res = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (res.success) {
+                        Swal.fire({ 
+                            title: "Success!", text: 'Status updated successfully!', icon: "success", timer: 2000, showConfirmButton: true
+                        }).then(() => {
+                            $("#orderModal").modal("hide"); 
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({ 
+                            title: "Warning!", text: 'Status updated Failed!', icon: "warning", timer: 2000, showConfirmButton: true
+                        }).then(() => {
+                            $("#orderModal").modal("hide"); 
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({ 
+                        title: "Error!", text: 'Something went wrong!', icon: "Error", timer: 2000, showConfirmButton: true
+                    }).then(() => {
+                        $("#orderModal").modal("hide"); 
+                    });
+                }
+            });
+        })
+
     });
+
+    function detailOrder(id){
+        
+        $.ajax({
+            url: "order.php",
+            type: "GET",
+            data: {id: id},
+            success: function (response) {
+                $('#change-status').empty();
+                $("#change-status").attr('data-order', id);
+                const res = typeof response === 'string' ? JSON.parse(response) : response;
+                $("#order-id").text(res.id);
+                $("#received-name").text(res.received_name);
+                $("#shipping-address").text(res.shipping_address);
+                $("#phone-number").text(res.phone_number);
+                $("#total-price").text(parseFloat(res.total_price).toLocaleString("id-ID"));
+                $("#status").text(res.status.charAt(0).toUpperCase() + res.status.slice(1));
+                $("#created-at").text(res.created_at);
+
+                let detailsHtml = "";
+                let totalQuantity = 0;
+                let totalPrice = 0;
+                const status = ['pending','processing','shipped','delivered','canceled'];
+                
+                status.forEach(stat => {
+                    $('#change-status').append(`<option ${ res.status === stat ? 'selected' : ''} value="${stat}">${stat}</option>`);
+                });
+                res.detail.forEach(item => {
+                    detailsHtml += `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>$ ${parseFloat(item.price).toLocaleString("id-ID")}</td>
+                            <td>${item.quantity}</td>
+                            <td class="text-end">$ ${(item.quantity * parseFloat(item.price)).toLocaleString("en-US")}</td>
+                        </tr>
+                    `;
+                    totalPrice += parseFloat(item.price) * item.quantity;
+                    totalQuantity += parseInt(item.quantity);
+                });
+
+                detailsHtml += `
+                    <tr>
+                        <td colspan="2">Total</td>
+                        <td>${totalQuantity}</td>
+                        <td class="text-end">$ ${totalPrice.toLocaleString("en-US")}</td>
+                    </tr>
+                `;
+
+                $("#order-details").html(detailsHtml);
+                $("#orderModal").modal("show");
+            },
+            error: function () {
+                Swal.fire({ 
+                    title: "Error!", text: "Failed to update product.", icon: "error", confirmButtonText: "OK"
+                });
+            }
+        });
+    }
 </script>
 <?php include("../inc/design/footer.php"); ?>

@@ -79,7 +79,7 @@ class Model {
             foreach ($carts as $item) {
                 $total_price += $item['price'] * $item['quantity'];
             }
-            
+
             $order_stmt = $this->conn->prepare("INSERT INTO orders (user_id, received_name, shipping_address, phone_number, total_price, cc_number, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'Pending', NOW())");
             $order_stmt->bind_param("isssds", $user_id, $received_name, $shipping_address, $phone_number, $total_price, $cc_number);
 
@@ -102,22 +102,35 @@ class Model {
             $delete_stmt->close();
             $this->conn->close();
 
-            return ["success" => true, "message" => "Payment successful!"];
+            return true;
         } catch (\Throwable $th) {
             $this->conn->close();
-            return ["success" => false, "message" => $th->getMessage(), "error" => $th];
+            return false;
         }
     }
 
-    public function getOrders($user_id) {
-        $query = "SELECT id, received_name, shipping_address, phone_number, total_price, status, created_at 
-            FROM orders 
-            WHERE user_id = ? 
-            ORDER BY created_at 
-        DESC";
+    public function getOrders($user_id = null) {
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $user_id);
+        if ($user_id != null) {
+            $query = "SELECT id, received_name, shipping_address, phone_number, total_price, status, created_at 
+                FROM orders 
+                WHERE user_id = ? 
+                ORDER BY created_at 
+            DESC";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $user_id);
+        } else {
+            $query = "SELECT id, received_name, shipping_address, phone_number, total_price, status, created_at 
+                FROM orders 
+                ORDER BY created_at 
+            DESC LIMIT 20";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+        }
+
+
         $stmt->execute();
         $result = $stmt->get_result();
         $orders = [];
@@ -128,6 +141,59 @@ class Model {
     
         $stmt->close();
         return $orders;
+    }
+
+    public function getOrderById($id, $relation = false) {
+        $query = "SELECT id, received_name, shipping_address, phone_number, total_price, status, created_at 
+            FROM orders 
+            WHERE id = ? 
+            ORDER BY created_at 
+        DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $order = $result->fetch_assoc();
+
+        if ($relation) {
+            
+            $query2 = "SELECT id, order_id, product_id, quantity, price, name 
+                FROM order_items
+                WHERE order_id = ? 
+                ORDER BY id 
+            DESC";
+
+            $stmt = $this->conn->prepare($query2);
+            $stmt->bind_param("i", $id);
+
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $orders = [];
+    
+            while ($row = $result->fetch_assoc()) {
+                $orders[] = $row;
+            }
+            $order['detail'] = $orders;
+        }
+
+        $stmt->close();
+        return $order;
+    }
+
+    public function updateStatusOrder($order_id, $status) {
+        $stmt = $this->conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+        $stmt->bind_param("si", $status, $order_id);
+    
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+
+        $stmt->close();
+        $this->conn->close();
     }
 
     public function getUserByEmail($email) {

@@ -31,6 +31,8 @@
                 $error = "No account found with that email.";
             }
         }
+    } else {
+        
     }
 ?>
 

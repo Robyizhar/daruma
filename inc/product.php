@@ -81,7 +81,6 @@
                 product_id: $(this).data("product"),
                 quantity: $("#quantity").val() || 1
             };
-
             $.ajax({
                 url: "cart.php", 
                 type: "POST",
@@ -92,19 +91,16 @@
                         Swal.fire({ title: "Success!", text: response.message, icon: "success", timer: 2000, showConfirmButton: true }).then(() => {
                             $("#add-modal").modal("hide");
                             updateCartCount(response.data.length);
-                            // location.reload();
                         });
                     } else {
                         Swal.fire({ title: "Failed!", text: response.message, icon: "warning", timer: 2000,   showConfirmButton: true }).then(() => {
                             $("#add-modal").modal("hide");
-                            // location.reload();
                         });
                     }
                 },
                 error: function(xhr, status, error) {
                     Swal.fire({ title: "Failed!", text: "Failed to add cart!", icon: "error", showConfirmButton: true }).then(() => {
                         $("#add-modal").modal("hide");
-                        // location.reload();
                     });
                     console.error(xhr.responseText);
                 }

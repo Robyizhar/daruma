@@ -44,8 +44,6 @@ class Model {
         } else {
             return false;
         }
-
-        // Get updated cart
     }
 
     public function getCartByUser($user_id) {
@@ -66,7 +64,65 @@ class Model {
         $stmt->close();
         return $cartItems;
     }
-    
+
+    public function addOrders($request) {
+        try {
+            $carts = $this->getCartByUser($request['user_id']);
+
+            $user_id = $request['user_id'];
+            $received_name = $request['name'];
+            $shipping_address = $request['shipping_address'];
+            $cc_number = $request['cc_number'];
+            $phone_number = $request['phone_number'];
+
+            $total_price = 0;
+            foreach ($carts as $item) {
+                $total_price += $item['price'] * $item['quantity'];
+            }
+
+            $order_stmt = $this->conn->prepare("INSERT INTO orders (user_id, received_name, shipping_address, phone_number, total_price, status, created_at) VALUES (?, ?, ?, ?, ?, 'Pending', NOW())");
+            $order_stmt->bind_param("isssd", $user_id, $name, $shipping_address, $phone, $total_price );
+
+            $order_stmt->execute();
+            $order_id = $order_stmt->insert_id;
+            $order_stmt->close();
+
+            $order_item_stmt = $this->conn->prepare("INSERT INTO order_items (order_id, product_id, name, price, quantity) VALUES (?, ?, ?, ?, ?)");
+
+            foreach ($carts as $item) {
+                $order_item_stmt->bind_param("iisdi", $order_id, $item['product_id'], $item['name'], $item['price'], $item['quantity']);
+                $order_item_stmt->execute();
+            }
+            $order_item_stmt->close();
+
+            // Clear user's cart
+            $delete_stmt = $this->conn->prepare("DELETE FROM cart WHERE user_id = ?");
+            $delete_stmt->bind_param("i", $user_id);
+            $delete_stmt->execute();
+            $delete_stmt->close();
+            $this->conn->close();
+
+            return ["success" => true, "message" => "Payment successful!"];
+        } catch (\Throwable $th) {
+            $this->conn->close();
+            return ["success" => false, "message" => $th->getMessage(), "error" => $th];
+        }
+    }
+
+    public function getOrders() {
+        $query = "SELECT id, received_name, shipping_address, phone_number, total_price, status, created_at 
+            FROM orders 
+            WHERE user_id = ? 
+            ORDER BY created_at 
+        DESC";
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        return $result->fetch_assoc();
+    }
 
     public function getUserByEmail($email) {
         $stmt = $this->conn->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
@@ -133,7 +189,6 @@ class Model {
         $stmt->execute();
         return $stmt->get_result();
     }
-    
 
     /* Get total products for pagination */
     public function getTotalProducts() {

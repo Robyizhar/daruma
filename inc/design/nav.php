@@ -1,9 +1,4 @@
-<?php
-    // session_start();
-    $current_page = basename($_SERVER['PHP_SELF']);
-
-
-?>
+<?php $current_page = basename($_SERVER['PHP_SELF']); ?>
 
 <nav id="nav-menu">
     <a href="<?= base_url('index.php') ?>" class="<?= ($current_page == 'index.php') ? 'active' : ''; ?>">Home</a>

@@ -6,7 +6,7 @@
     if (!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] == "GET") {
         header("Location: account.php");
         exit;
-    } else {
+    } else if(!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] != "GET") {
         echo json_encode([ 
             "data_redirect" => 'account.php',
             "message" => 'You must login first'

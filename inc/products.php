@@ -5,7 +5,6 @@
     include("./sql/db.php");
     session_start();
     
-    /* Set default values */
     $Model = new Model();
 
     $productsPerPage = 12;
@@ -14,6 +13,7 @@
 
     $minPrice_formatted = isset($_GET['min_price']) ? $_GET['min_price'] : '$ 0';
     $maxPrice_formatted = isset($_GET['max_price']) ? $_GET['max_price'] : '$ 1.000.000.000';
+    $category_id = isset($_GET['category']) ? $_GET['category'] : null;
     
     /* Make sure the price input is only numbers */
     $minPrice = isset($_GET['min_price']) ? (int) preg_replace("/[^0-9]/", "", $_GET['min_price']) : 0;
@@ -27,11 +27,13 @@
     }
     
     /* Get total products based on price range */
-    $totalProducts = $Model->getTotalProductsByPrice($minPrice, $maxPrice);
+    $totalProducts = $Model->getTotalProducts($minPrice, $maxPrice, $category_id);
     $totalPages = ceil($totalProducts / $productsPerPage);
     
     /* Retrieve product data based on price filter */
-    $result = $Model->getProductsByPrice($minPrice, $maxPrice, $productsPerPage, $offset);
+    $products = $Model->getProducts($productsPerPage, $offset, $minPrice, $maxPrice, $category_id);
+
+    $categories = $Model->getCategory();
 ?>
 
 <div class="container">
@@ -42,23 +44,35 @@
         <!-- Filter Form -->
         <form method="GET" action="" class="mb-4">
             <div class="row g-3 align-items-end">
-                <div class="col-12 col-sm-12 col-md-4">
+                <div class="col-12 col-sm-12 col-md-3">
+                    <label for="category" class="form-label" style="text-align: left;">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        <?php foreach ($categories as $category): ?>
+                            <option value="<?= htmlspecialchars($category['id']) ?>" 
+                                <?= ($category['id'] == $category_id) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($category['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-12 col-sm-12 col-md-3">
                     <label for="min_price" class="form-label" style="text-align: left;">Min Price</label>
                     <input type="text" class="form-control number-filter" id="min_price" name="min_price" value="<?= $minPrice_formatted ?>">
                 </div>
-                <div class="col-12 col-sm-12 col-md-4">
+                <div class="col-12 col-sm-12 col-md-3">
                     <label for="max_price" class="form-label" style="text-align: left;">Max Price</label>
                     <input type="text" class="form-control number-filter" id="max_price" name="max_price" value="<?= $maxPrice_formatted ?>">
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 d-flex align-items-end">
+                <div class="col-12 col-sm-12 col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-50 m-0">Apply Filter</button>
                 </div>
             </div>
         </form>
 
         <div class="products-grid">
-            <?php if ($result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): 
+            <?php if (count($products) > 0): ?>
+                <?php foreach ($products as $row): 
                     $product_id = $row['id'];
                     $name = htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');
                     $edition = htmlspecialchars($row['edition'], ENT_QUOTES, 'UTF-8');
@@ -68,14 +82,18 @@
                 ?>
                     <div class="product">
                         <a href="<?= $product_url ?>">
-                            <img src="<?= base_url($image) ?>" alt="<?= $name ?>">
+                            <img 
+                                src="<?= base_url($image) ?>" 
+                                onerror="this.onerror=null; this.src='<?= base_url('images/products/default_image.png') ?>';" 
+                                alt="<?= $name ?>"
+                            >
                         </a>
                         <h3><a href="<?= $product_url ?>"><?= $name ?></a></h3>
                         <p class="product-edition"><?= $edition ?></p>
                         <p>$<?= $price ?></p>
                         <a href="<?= $product_url ?>" class="buy-now">View Product</a>
                     </div>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             <?php else: ?>
                 <p>No products available in this price range.</p>
             <?php endif; ?>

@@ -23,7 +23,9 @@
         <?php if($product): ?>
         <!-- Left column: Product image -->
         <div class="product-image" style="float: left; width: 40%; text-align: center;">
-            <img src="<?= base_url(htmlspecialchars($product['image'])) ?>" 
+            <img 
+                src="<?= base_url(htmlspecialchars($product['image'])) ?>" 
+                onerror="this.onerror=null; this.src='<?= base_url('images/products/default_image.png') ?>';" 
                 alt="<?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?>" 
                 style="max-width:100%;"
             >

@@ -126,7 +126,7 @@
                 </tr>
             </thead>
             <tbody id="productTable">
-                <?php while ($row = $result->fetch_assoc()): ?>
+                <?php foreach ($result as $row): ?>
                     <tr data-id="<?= $row['id'] ?>">
                         <td class="text-white"><?= htmlspecialchars($row['name']) ?></td>
                         <td class="text-white"><?= htmlspecialchars($row['edition']) ?></td>
@@ -138,7 +138,7 @@
                             <button class="btn btn-danger btn-sm delete-btn">Delete</button>
                         </td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </tbody>
         </table>
 

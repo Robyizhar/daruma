@@ -49,9 +49,14 @@
             <div class="col-md-4">
                 <div class="product text-center pb-4">
                     <a href="<?= $product_url ?>">
-                        <img src="<?= base_url(htmlspecialchars($rowNewProducts['image'])) ?>" alt="iPhone 16 Pro - White Titanium" class="img-fluid">
+                        <img 
+                            src="<?= base_url(htmlspecialchars($rowNewProducts['image'])) ?>" 
+                            onerror="this.onerror=null; this.src='<?= base_url('images/products/default_image.png') ?>';" 
+                            alt="<?= htmlspecialchars($rowNewProducts['name']) ?>" 
+                            class="img-fluid"
+                        >
                     </a>
-                    <h3><a href="product.php?id=2"><?= htmlspecialchars($rowNewProducts['name']) ?></a></h3>
+                    <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($rowNewProducts['name']) ?></a></h3>
                     <p class="text-muted"><?= htmlspecialchars($rowNewProducts['edition']) ?></p>
                     <p class="fw-bold">From $<?= number_format($rowNewProducts['price'], 2) ?></p>
                 </div>
@@ -74,7 +79,7 @@
                     <a href="<?= $product_url ?>">
                         <img src="<?= base_url(htmlspecialchars($rowNewProducts['image'])) ?>" alt="iPhone 16 Pro - White Titanium" class="img-fluid">
                     </a>
-                    <h3><a href="product.php?id=2"><?= htmlspecialchars($rowNewProducts['name']) ?></a></h3>
+                    <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($rowNewProducts['name']) ?></a></h3>
                     <p class="text-muted"><?= htmlspecialchars($rowNewProducts['edition']) ?></p>
                     <p class="fw-bold">From $<?= number_format($rowNewProducts['price'], 2) ?></p>
                 </div>

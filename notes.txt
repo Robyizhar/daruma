@@ -1,0 +1,54 @@
+index.php
+- hide registration menu when user has logged in.
+
+cart.php
+- remove from cart function.
+
+account.php
+- check email format is correct.
+- order id to be 4 digit (0111 instead of 10)
+
+products.php
+- filters for product type (camera, phone, etc.).
+- all images to be transparent png, no white background.
+- make sure all images are not corrupted.
+- make sure the product image fits the product name and description.
+
+product.php
+- check if stock is sufficient if not cannot add to cart. 
+- every item maximum quantity of 5.
+- product quantity to be integers only (i can put 0.1).
+
+register.php
+- check email format is correct, password at least 8 letters (except admin).
+- reject if account already exists.
+- email validation (PHPMailer)
+
+payment.php
+- integrate with payment gateway (stripe, paypal, etc.).
+- billing details more info (postal, email)
+- check phone number and email format is correct.
+- order confirmation with PHPMailer
+
+admin.php
+- chart (chart.js) to view most sales
+- admin must not be able to add to cart.
+- make sure order time is synced to local time (SGT).
+- additional option for product type when adding product. 
+- the page numbers at the bottom do it like products, at end of page or start of page, there shouldnt be an option to go previous or next.
+
+about.php
+- sample images for each milestone in each circle.
+
+design/footer.php
+- quick links for shortcuts to other pages.
+
+contact.php (new)
+- page for faq, store contact, and email.
+
+additional
+- make sure PHPMailer is working for email confirmation, order confirmation.
+- normalise theme of web app to be primary black, white, and red (no blue please).
+- normalise the language to all be in english, price to be in SGD and 2 d.p., and (2,999 not 2.999)
+- report explaining code.
+- use this website as reference https://www.harveynorman.com.sg/

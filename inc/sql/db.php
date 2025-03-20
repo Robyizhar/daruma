@@ -12,7 +12,7 @@ class Model {
         ];
         $conn = new mysqli($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
         if ($conn->connect_error) 
-            die("Koneksi gagal: " . $conn->connect_error);
+            die("Connection failed: " . $conn->connect_error);
     
         $this->conn = $conn;
     }
@@ -230,8 +230,45 @@ class Model {
         }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    |Query Product and Category
+    |--------------------------------------------------------------------------
+    */
+
+    public function getCategory() {
+        $query = "SELECT * FROM categories  ORDER BY id ASC LIMIT 20";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $response = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $response[] = $row;
+        }
+    
+        $stmt->close();
+        return $response;
+    }
+
+    private function productStatement() {
+        return  "SELECT 
+            products.id, 
+            products.name, 
+            products.edition,
+            products.price,
+            products.description,
+            products.image,
+            categories.id AS category_id,
+            categories.name AS category_name
+        FROM products
+        JOIN categories ON categories.id = products.category_id ";
+    }
+
     public function getProductById($id) {
-        $stmt = $this->conn->prepare("SELECT id, name, edition, price, description, image FROM products WHERE id = ?");
+        $stmt = $this->conn->prepare( $this->productStatement() . "WHERE products.id = ?");
         if (!$stmt) {
             return null;
         }
@@ -243,38 +280,108 @@ class Model {
         return $result->fetch_assoc();
     }
 
-    /* Get the total number of products based on price range */
-    public function getTotalProductsByPrice($minPrice, $maxPrice) {
-        $stmt = $this->conn->prepare("SELECT COUNT(id) AS total FROM products WHERE price BETWEEN ? AND ?");
-        $stmt->bind_param("ii", $minPrice, $maxPrice);
+    public function getProductByCategoryId($id) {
+        $stmt = $this->conn->prepare( $this->productStatement() . "WHERE categories.id = ?");
+        if (!$stmt) {
+            return null;
+        }
+    
+        $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
         $stmt->close();
-        return $row['total'];
+        return $result->fetch_assoc();
     }
 
-    /* Get products based on price filters and pagination */
-    public function getProductsByPrice($minPrice, $maxPrice, $limit, $offset) {
-        $stmt = $this->conn->prepare("SELECT id, name, edition, price, image FROM products WHERE price BETWEEN ? AND ? ORDER BY created_at DESC LIMIT ? OFFSET ?");
-        $stmt->bind_param("iiii", $minPrice, $maxPrice, $limit, $offset);
+    /* Get total number of products (with optional price range) */
+    public function getTotalProducts($minPrice = null, $maxPrice = null, $category = null) {
+        $query = "SELECT COUNT(products.id) AS total FROM products 
+                  JOIN categories ON categories.id = products.category_id";
+        $params = [];
+        $types = "";
+        $conditions = [];
+
+        if ($minPrice !== null && $maxPrice !== null) {
+            $conditions[] = "products.price BETWEEN ? AND ?";
+            $params[] = $minPrice;
+            $params[] = $maxPrice;
+            $types .= "ii";
+        }
+
+        if ($category !== null) {
+            $conditions[] = "products.category_id = ?";
+            $params[] = $category;
+            $types .= "i";
+        }
+
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $stmt = $this->conn->prepare($query);
+
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
         $stmt->execute();
-        return $stmt->get_result();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['total'] ?? 0;
     }
 
-    /* Get total products for pagination */
-    public function getTotalProducts() {
-        $result = $this->conn->query("SELECT COUNT(*) as total FROM products");
-        return $result->fetch_assoc()['total'];
-    }
-
-    /* Get product list with pagination */
-    public function getProducts($limit, $offset) {
-        $stmt = $this->conn->prepare("SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?");
-        $stmt->bind_param("ii", $limit, $offset);
+    /* Get products with optional price filter and pagination */
+    public function getProducts($limit, $offset, $minPrice = null, $maxPrice = null, $category = null) {
+        $query = $this->productStatement();
+        $params = [];
+        $types = "";
+        $conditions = [];
+    
+        if ($minPrice !== null && $maxPrice !== null) {
+            $conditions[] = "products.price BETWEEN ? AND ?";
+            $params[] = $minPrice;
+            $params[] = $maxPrice;
+            $types .= "ii";
+        }
+    
+        if ($category !== null) {
+            $conditions[] = "products.category_id = ?";
+            $params[] = $category;
+            $types .= "i";
+        }
+    
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+        }
+    
+        $query .= " ORDER BY products.created_at DESC LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+        $types .= "ii";
+    
+        error_log("Query: " . $query);
+        error_log("Params: " . json_encode($params));
+        error_log("Types: " . $types);
+    
+        $stmt = $this->conn->prepare($query);
+    
+        if (!$stmt) {
+            die("Prepare failed: " . $this->conn->error);
+        }
+    
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+    
         $stmt->execute();
-        return $stmt->get_result();
+        $result = $stmt->get_result();
+        $response = $result->fetch_all(MYSQLI_ASSOC);
+    
+        $stmt->close();
+        return $response;
     }
+    
 
     /* Add product */
     public function addProduct($name, $description, $edition, $price, $image = null) {
@@ -318,5 +425,11 @@ class Model {
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    |Query Product
+    |--------------------------------------------------------------------------
+    */
 }
 ?>

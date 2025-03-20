@@ -44,49 +44,49 @@
         </div>
     </div>
     <div class="row">
-        <?php while ($rowNewProducts = $resultNewProducts->fetch_assoc()): ?>
-            <?php $product_url = "inc/product.php?id=" . $rowNewProducts['id']; ?>
+        <?php foreach ($resultNewProducts as $row): ?>
+            <?php $product_url = "inc/product.php?id=" . $row['id']; ?>
             <div class="col-md-4">
                 <div class="product text-center pb-4">
                     <a href="<?= $product_url ?>">
                         <img 
-                            src="<?= base_url(htmlspecialchars($rowNewProducts['image'])) ?>" 
+                            src="<?= base_url(htmlspecialchars($row['image'])) ?>" 
                             onerror="this.onerror=null; this.src='<?= base_url('images/products/default_image.png') ?>';" 
-                            alt="<?= htmlspecialchars($rowNewProducts['name']) ?>" 
+                            alt="<?= htmlspecialchars($row['name']) ?>" 
                             class="img-fluid"
                         >
                     </a>
-                    <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($rowNewProducts['name']) ?></a></h3>
-                    <p class="text-muted"><?= htmlspecialchars($rowNewProducts['edition']) ?></p>
-                    <p class="fw-bold">From $<?= number_format($rowNewProducts['price'], 2) ?></p>
+                    <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($row['name']) ?></a></h3>
+                    <p class="text-muted"><?= htmlspecialchars($row['edition']) ?></p>
+                    <p class="fw-bold">From $<?= number_format($row['price'], 2) ?></p>
                 </div>
             </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
 </div>
 
-<div class="container mt-5">
+<!-- <div class="container mt-5">
     <div class="row">
         <div class="col">
             <h3 class="text-center">Best Sellers</h3>
         </div>
     </div>
     <div class="row">
-        <?php while ($rowNewProducts = $resultNewProducts->fetch_assoc()): ?>
-            <?php $product_url = "inc/product.php?id=" . $rowNewProducts['id']; ?>
+        <?php foreach ($resultNewProducts as $row): ?>
+            <?php $product_url = "inc/product.php?id=" . $row['id']; ?>
             <div class="col-md-4">
                 <div class="product text-center pb-4">
                     <a href="<?= $product_url ?>">
-                        <img src="<?= base_url(htmlspecialchars($rowNewProducts['image'])) ?>" alt="iPhone 16 Pro - White Titanium" class="img-fluid">
+                        <img src="<?= base_url(htmlspecialchars($row['image'])) ?>" alt="iPhone 16 Pro - White Titanium" class="img-fluid">
                     </a>
-                    <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($rowNewProducts['name']) ?></a></h3>
-                    <p class="text-muted"><?= htmlspecialchars($rowNewProducts['edition']) ?></p>
-                    <p class="fw-bold">From $<?= number_format($rowNewProducts['price'], 2) ?></p>
+                    <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($row['name']) ?></a></h3>
+                    <p class="text-muted"><?= htmlspecialchars($row['edition']) ?></p>
+                    <p class="fw-bold">From $<?= number_format($row['price'], 2) ?></p>
                 </div>
             </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
-</div>
+</div> -->
 
 <div class="container mt-5">
     <div class="row">

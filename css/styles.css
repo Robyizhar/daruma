@@ -216,7 +216,7 @@ nav a.active {
 
 input {
     width: 80%; 
-    max-width: 300px; 
+    /* max-width: 300px;  */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;

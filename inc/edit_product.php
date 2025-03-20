@@ -2,8 +2,8 @@
     include("./config/config.php");
     include("./sql/db.php");
 
-    try {
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        try {
             $id = isset($_POST["id"]) ? intval($_POST["id"]) : 0;
             $name = isset($_POST["name"]) ? trim($_POST["name"]) : "";
             $description = isset($_POST["description"]) ? trim($_POST["description"]) : "";
@@ -54,9 +54,10 @@
                 $response["message"] = "Invalid input.";
                 echo json_encode($response);
             }
+        } catch (\Throwable $th) {
+            $response["message"] = $th->getMessage();
+            echo json_encode($response);
         }
-    } catch (\Throwable $th) {
-        $response["message"] = $th->getMessage();
-        echo json_encode($response);
     }
+    
 ?>

@@ -3,13 +3,7 @@
         return 'http://codingo_webapp.test/' . ltrim($path, '/');
     }
 
-    function checkImage($url) {
-        $headers = @get_headers($url);
-        if ($headers && strpos($headers[0], '200')) {
-            return $url;
-        }
-        return null;
-    }
+    date_default_timezone_set('Asia/Singapore');
 
     /* Database Configuration */
     // $config = [

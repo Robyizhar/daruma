@@ -14,6 +14,12 @@
         exit;
     }
 
+    /*  Prevent admin from accessing cart.php page. */
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+        header("Location: account.php");
+        exit;
+    }
+
     /* Insert To Cart */
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $product_id = $_POST['product_id'];
@@ -31,7 +37,6 @@
     /* Insert To Cart */
 
     $data_carts = $Model->getCartByUser($_SESSION['user_id']);
-    $count_carts = count($data_carts);
 
     include("../inc/design/head.php"); 
     include("../inc/design/header.php"); 
@@ -99,12 +104,7 @@
 
 </div>
 
-<script>
-    let COUNT_CART = <?php echo $count_carts; ?>;
-    document.addEventListener("DOMContentLoaded", function () {
-        updateCartCount(COUNT_CART);
-    });
-    
+<script>    
     function goToProduct(productId) {
         window.location.href = `product.php?id=${productId}`;
     }

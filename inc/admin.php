@@ -16,7 +16,7 @@
     }
 
     /* Pagination */
-    $productsPerPage = 10;
+    $productsPerPage = 2;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $productsPerPage;
     $totalProducts = $Model->getTotalProducts();
@@ -34,6 +34,7 @@
         exit();
     }
     $current_page = basename($_SERVER['PHP_SELF']);
+    $categories = $Model->getCategory();
 
     include("../inc/design/head.php"); 
     include("../inc/design/header.php"); 
@@ -118,6 +119,7 @@
             <thead>
                 <tr>
                     <th class="text-white">Name</th>
+                    <th class="text-white">Type</th>
                     <th class="text-white">Edition</th>
                     <th class="text-white">Description</th>
                     <th class="text-white">Price</th>
@@ -129,10 +131,17 @@
                 <?php foreach ($result as $row): ?>
                     <tr data-id="<?= $row['id'] ?>">
                         <td class="text-white"><?= htmlspecialchars($row['name']) ?></td>
+                        <td class="text-white" data-id=<?= $row['category_id'] ?> ><?= htmlspecialchars($row['category_name']) ?></td>
                         <td class="text-white"><?= htmlspecialchars($row['edition']) ?></td>
                         <td class="text-white"><?= htmlspecialchars($row['description']) ?></td>
                         <td class="text-white">$<?= number_format($row['price'], 2) ?></td>
-                        <td class="text-white"><img src="<?= base_url(htmlspecialchars($row['image'])) ?>" width="50"></td>
+                        <td class="text-white">
+                                <img 
+                                    src="<?= base_url(htmlspecialchars($row['image'])) ?>" 
+                                    onerror="this.onerror=null; this.src='<?= base_url('images/products/default_image.png') ?>';" 
+                                    width="50"
+                                >
+                        </td>
                         <td class="text-white">
                             <button class="btn btn-warning btn-sm edit-btn">Edit</button>
                             <button class="btn btn-danger btn-sm delete-btn">Delete</button>
@@ -145,19 +154,19 @@
         <!-- Pagination -->
         <nav>
             <ul class="pagination justify-content-center">
-                <li class="page-item <?= ($page == 1) ? 'disabled' : '' ?>">
+                <!-- <li class="page-item <?= ($page == 1) ? 'disabled' : '' ?>">
                     <a class="page-link" href="?page=<?= $page - 1 ?>">Previous</a>
-                </li>
+                </li> -->
                 
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                     <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
                         <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
                     </li>
                 <?php endfor; ?>
-
+                <!-- 
                 <li class="page-item <?= ($page == $totalPages) ? 'disabled' : '' ?>">
                     <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
-                </li>
+                </li> -->
             </ul>
         </nav>
     </div>
@@ -165,6 +174,7 @@
 
 </div>
 
+<!-- Modal -->
 <div class="modal fade" id="add-modal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -174,11 +184,20 @@
             </div>
             <div class="modal-body">
                 <form id="addProductForm" enctype="multipart/form-data">
-                    <input type="text" class="form-control mb-2" id="addName" name="name" placeholder="Product Name" required>
-                    <input type="text" class="form-control mb-2" id="addEdition" name="edition" placeholder="Product Edition" required>
-                    <textarea class="form-control mb-2" id="addDescription" name="description" placeholder="Product Description" required></textarea>
-                    <input type="number" class="form-control mb-2" id="addPrice" name="price" placeholder="Price" required>
-                    <input type="file" class="form-control mb-2" id="addImage" name="image" required>
+                    <input type="text" class="form-control mb-2" name="name" placeholder="Product Name" required>
+                    <select class="form-select mb-2" name="category">
+                        <option value="">All Categories</option>
+                        <?php foreach ($categories as $category): ?>
+                            <option value="<?= htmlspecialchars($category['id']) ?>" 
+                                <?php // echo ($category['id'] == $category_id) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($category['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="text" class="form-control mb-2" name="edition" placeholder="Product Edition" required>
+                    <textarea class="form-control mb-2" name="description" placeholder="Product Description" required></textarea>
+                    <input type="number" class="form-control mb-2" name="price" placeholder="Price" required>
+                    <input type="file" class="form-control mb-2" name="image" required>
                 </form>
             </div>
             <div class="modal-footer">
@@ -199,6 +218,14 @@
                 <form id="editProductForm" enctype="multipart/form-data">
                     <input type="hidden" id="editId" name="id">
                     <input type="text" class="form-control mb-2" id="editName" name="name" placeholder="Product Name" required>
+                    <select class="form-select mb-2" name="category" id="category">
+                        <option value="">All Categories</option>
+                        <?php foreach ($categories as $category): ?>
+                            <option value="<?= htmlspecialchars($category['id']) ?>" >
+                                <?= htmlspecialchars($category['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                     <input type="text" class="form-control mb-2" id="editEdition" name="edition" placeholder="Product Edition" required>
                     <textarea class="form-control mb-2" id="editDescription" name="description" placeholder="Product Description" required></textarea>
                     <input type="text" class="form-control mb-2 number-filter" id="editPrice" name="price" placeholder="Price" required>
@@ -214,7 +241,6 @@
     </div>
 </div>
 
-<!-- Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -257,6 +283,7 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -289,7 +316,7 @@
                         });
                     } else {
                         Swal.fire({ 
-                            title: "Failed!", text: res.message, icon: "warning", timer: 2000,   showConfirmButton: true
+                            title: "Failed!", text: res.message, icon: "warning", timer: 10000,   showConfirmButton: true
                         }).then(() => {
                             $("#add-modal").modal("hide");
                             location.reload();
@@ -319,9 +346,10 @@
             let row = $(this).closest("tr");
             $("#editId").val(row.data("id"));
             $("#editName").val(row.find("td:eq(0)").text());
-            $("#editEdition").val(row.find("td:eq(1)").text());
-            $("#editDescription").val(row.find("td:eq(2)").text());
-            $("#editPrice").val(row.find("td:eq(3)").text().replace("$", ""));
+            $("#category").val(row.find("td:eq(1)").data("id"));
+            $("#editEdition").val(row.find("td:eq(2)").text());
+            $("#editDescription").val(row.find("td:eq(3)").text());
+            $("#editPrice").val(row.find("td:eq(4)").text().replace("$", ""));
             let imageUrl = row.find("img").attr("src");
             $("#editImagePreview").attr("src", imageUrl);
             $("#edit-modal").modal("show");
@@ -374,8 +402,7 @@
                     type: 'update_status'
                 },
                 success: function (response) {
-                    console.log('response', response);
-                    
+                    // console.log('response', response);
                     const res = typeof response === 'string' ? JSON.parse(response) : response;
                     if (res.success) {
                         Swal.fire({ 
@@ -405,7 +432,6 @@
     });
 
     function detailOrder(id){
-        
         $.ajax({
             url: "order.php",
             type: "GET",

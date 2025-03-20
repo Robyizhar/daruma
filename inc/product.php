@@ -77,7 +77,7 @@
                         });
                     } else {
                         Swal.fire({ title: "Failed!", text: response.message, icon: "warning", timer: 2000,   showConfirmButton: true }).then(() => {
-                            window.location.assign("account.php");
+                            window.location.assign(response.data_redirect ? response.data_redirect : "account.php");
                         });
                     }
                 },

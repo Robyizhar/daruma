@@ -16,8 +16,16 @@
 
     /*  Prevent admin from accessing cart.php page. */
     if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
-        header("Location: account.php");
-        exit;
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            header("Location: account.php");
+            exit;
+        } else {
+            echo json_encode([ 
+                "data_redirect" => 'account.php',
+                "message" => 'Admins may not add carts'
+            ]);
+            exit;
+        }
     }
 
     /* Insert To Cart */

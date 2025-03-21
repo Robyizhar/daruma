@@ -3,10 +3,12 @@
     include("./sql/db.php");
     $Model = new Model();
 
-    if (!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] == "GET") {
-        header("Location: account.php");
-        exit;
-    } else if(!isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] != "GET") {
+    /* Redirect if user is not logged in */
+    if (!isset($_SESSION['user_id'])) {
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            header("Location: account.php");
+            exit;
+        } 
         echo json_encode([ 
             "data_redirect" => 'account.php',
             "message" => 'You must login first'
@@ -14,54 +16,60 @@
         exit;
     }
 
-    /*  Prevent admin from accessing cart.php page. */
+    /* Prevent admin from accessing cart.php */
     if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
             header("Location: account.php");
             exit;
-        } else {
-            echo json_encode([ 
-                "data_redirect" => 'admin.php',
-                "message" => 'Admins may not add carts'
-            ]);
-            exit;
-        }
+        } 
+        echo json_encode([ 
+            "data_redirect" => 'admin.php',
+            "message" => 'Admins may not add carts'
+        ]);
+        exit;
     }
 
-    /* Insert To Cart */
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
+    /* Handle POST requests for carts */
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $action = $_POST['action'] ?? null;
+        $user_id = $_SESSION['user_id'];
 
-        if (isset($_POST['action']) && $_POST['action'] == 'add-cart' )  {
-            $product_id = $_POST['product_id'];
-            $quantity = $_POST['quantity'];
-            $user_id = $_SESSION['user_id'];
+        switch ($action) {
+            case 'add-cart':
+                $product_id = $_POST['product_id'];
+                $quantity = $_POST['quantity'];
+                $insert = $Model->addToCart($user_id, $product_id, $quantity);
+                echo json_encode([
+                    "success" => (bool) $insert,
+                    "message" => $insert ? "Product successfully added to cart!" : "Failed to add to cart!",
+                    "data" => $insert
+                ]);
+            break;
 
-            $insert = $Model->addToCart($user_id, $product_id, $quantity);
-            if ($insert) {
-                echo json_encode(["success" => true, "message" => "Product successfully added to cart!", "data" => $insert]);
-            } else {
-                echo json_encode(["success" => false, "message" => "Failed to add to cart!"]);
-            }
-            exit;
-        } else if(isset($_POST['action']) && $_POST['action'] == 'remove-cart' ) {
-            $deleted = $Model->dCartById($_POST['id'], $_SESSION['user_id']);
-            if ($deleted) {
-                echo json_encode(["success" => true, "message" => "Item successfully removed from cart!", "data" => $delete]);
-            } else {
-                echo json_encode(["success" => false, "message" => "Failed to removed from cart!"]);
-            }
-            exit;
-        } else if(isset($_POST['action']) && $_POST['action'] == 'update-cart' ) {
-            $updated = $Model->updateCartById($_POST['id'], $_SESSION['user_id'], $_POST['quantity']);
-            if ($updated) {
-                echo json_encode(["success" => true, "message" => "Item successfully removed from cart!", "data" => $updated]);
-            } else {
-                echo json_encode(["success" => false, "message" => "Failed to removed from cart!"]);
-            }
-            exit;
+            case 'remove-cart':
+                $deleted = $Model->deleteCartById($_POST['id'], $user_id);
+                echo json_encode([
+                    "success" => (bool) $deleted,
+                    "message" => $deleted ? "Item successfully removed from cart!" : "Failed to remove from cart!",
+                    "data" => $deleted
+                ]);
+            break;
+
+            case 'update-cart':
+                $updated = $Model->updateCartById($_POST['id'], $user_id, $_POST['quantity']);
+                echo json_encode([
+                    "success" => (bool) $updated,
+                    "message" => $updated ? "Item successfully updated in cart!" : "Failed to update cart!",
+                    "data" => $updated
+                ]);
+            break;
+
+            default:
+                echo json_encode(["success" => false, "message" => "Invalid action!"]);
+            break;
         }
+        exit;
     }
-    /* Insert To Cart */
 
     $data_carts = $Model->getCartByUser($_SESSION['user_id']);
 
@@ -107,7 +115,7 @@
                         <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white">$<?= number_format($row['price'], 2) ?></td>
                         <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= htmlspecialchars($row['added_at']) ?></td>
                         <td class="text-white">
-                            <input style="max-width: 100px;" type="text" data-id="<?= $row['id'] ?>" class="form-control number-only cart-quantity" value="<?= htmlspecialchars($row['quantity']) ?>">
+                            <input style="max-width: 100px;" type="number" min="1" max="<?= $row['stock'] ?>" data-id="<?= $row['id'] ?>" disabled class="form-control number-only cart-quantity" value="<?= htmlspecialchars($row['quantity']) ?>">
                         </td>
                         <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white text-end">$ <?= number_format(htmlspecialchars($row['quantity']) *  $row['price'], 2) ?></td>
                         <td class="text-white text-end">
@@ -124,8 +132,14 @@
                 <?php endforeach; ?>
                 <tr class="table-dark">
                     <td class="text-center" colspan="4"><strong>Total</strong></td>
-                    <td><strong><?= $all_quantities ?></strong></td>
-                    <td class="text-end"><strong>$ <?= number_format($all_prices, 2) ?></strong></td>
+                    <td>
+                        <strong id="total-quantity"><?= $all_quantities ?></strong>
+                        <input type="hidden" value="<?= $all_quantities ?>" id="total-quantity-hide">
+                        <input type="hidden" value="<?= $all_prices ?>" id="total-prices-hide">
+                        </td>
+                    <td class="text-end">
+                        <strong id="total-prices">$ <?= number_format($all_prices, 2) ?></strong>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -189,23 +203,41 @@
             let id = $(this).data("id");  
             let quantity = $(this).val();     
 
-            if (quantity < 1) {
-                quantity = 1;
+            if (quantity > 1) {
+                $.ajax({
+                    url: "cart.php",
+                    type: "POST",
+                    data: { id: id, quantity: quantity, action: 'update-cart' },
+                    success: function (response) {
+                        console.log("Update Successfully:", response);
+                        // updateTotal();
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({ title: "Failed!", text: xhr.responseText, icon: "error", showConfirmButton: true });
+                    }
+                });
             }
-
-            $.ajax({
-                url: "cart.php",
-                type: "POST",
-                data: { id: id, quantity: quantity, action: 'update-cart' },
-                success: function (response) {
-                    console.log("Update Successfully:", response);
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({ title: "Failed!", text: xhr.responseText, icon: "error", showConfirmButton: true });
-                }
-            });
-
         });
     });
+
+    function updateTotal() {
+        let total = 0;
+
+        $(".cart-quantity").each(function () {
+            let row = $(this).closest("tr");
+            let quantity = parseInt($(this).val()) || 0;
+            let price = parseFloat(row.find("td:nth-child(3)").text().replace("$", "")) || 0;
+            
+            let subtotal = quantity * price;
+            row.find("td:nth-child(6)").text("$ " + subtotal.toFixed(2)); // Update subtotal
+            
+            total += subtotal;
+        });
+
+        console.log('total', total);
+        
+
+        $("#total-prices").text("$ " + total.toFixed(2)); // Update total cart
+    }
 
 </script>

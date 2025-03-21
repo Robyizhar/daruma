@@ -41,14 +41,22 @@
             <p class="price">
                 $<?= number_format($product['price']); ?>
             </p>
+            <!-- Stock Information -->
+            <p class="stock" style="color: <?= ($product['stock'] > 0) ? 'green' : 'red' ?>;">
+                Stock: <?= $product['stock'] > 0 ? $product['stock'] . ' available' : 'Out of stock' ?>
+            </p>
             <p class="description">
                 <?= nl2br(htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8')); ?>
             </p>
             <!-- Quantity Input -->
+            <?php if($product['stock'] > 0): ?>
             <label for="quantity">Quantity:</label>
-            <input type="text" id="quantity" name="quantity" value="1" min="1" class="number-only" style="width: 60px; padding: 5px; text-align: center; margin-right: 10px;">
+            <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?= $product['stock'] ?>" class="number-only" style="width: 60px; padding: 5px; text-align: center; margin-right: 10px;" <?= $product['stock'] > 0 ? '' : 'disabled' ?>>
+            <?php endif; ?>
             <!-- Add to Cart Button -->
-            <button class="add-to-cart" data-product="<?= $product['id'] ?>">Add to Cart</button>
+            <button class="add-to-cart" data-product="<?= $product['id'] ?>" <?= $product['stock'] > 0 ? '' : 'disabled' ?>>
+                <?= $product['stock'] > 0 ? 'Add to Cart' : 'Out of Stock' ?>
+            </button>
         </div>
         <?php else: ?>
         <div><p>The product you are looking for is no longer available or has recently been removed.</p></div>
@@ -56,6 +64,7 @@
         <div style="clear:both;"></div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {

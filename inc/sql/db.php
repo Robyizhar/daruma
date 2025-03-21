@@ -74,10 +74,12 @@ class Model {
     }
 
     public function getCartByUser($user_id) {
-        $stmt = $this->conn->prepare("SELECT c.id, c.product_id, p.name, p.price, c.quantity, c.added_at 
-            FROM cart c 
-            JOIN products p ON c.product_id = p.id 
-            WHERE c.user_id = ?");
+        $stmt = $this->conn->prepare(
+            "SELECT cart.id, cart.product_id, products.name, products.price, products.stock, cart.quantity, cart.added_at 
+            FROM cart
+            JOIN products ON cart.product_id = products.id 
+            WHERE cart.user_id = ?"
+        );
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         
@@ -115,12 +117,17 @@ class Model {
             $order_stmt->close();
 
             $order_item_stmt = $this->conn->prepare("INSERT INTO order_items (order_id, product_id, name, price, quantity) VALUES (?, ?, ?, ?, ?)");
+            $update_stock_stmt = $this->conn->prepare("UPDATE products SET stock = stock - ? WHERE id = ?");
 
             foreach ($carts as $item) {
                 $order_item_stmt->bind_param("iisdi", $order_id, $item['product_id'], $item['name'], $item['price'], $item['quantity']);
                 $order_item_stmt->execute();
+
+                $update_stock_stmt->bind_param("ii", $item['quantity'], $item['product_id']);
+                $update_stock_stmt->execute();
             }
             $order_item_stmt->close();
+            $update_stock_stmt->close();
 
             // Clear user's cart
             $delete_stmt = $this->conn->prepare("DELETE FROM cart WHERE user_id = ?");
@@ -288,6 +295,7 @@ class Model {
             products.price,
             products.description,
             products.image,
+            products.stock,
             categories.id AS category_id,
             categories.name AS category_name
         FROM products

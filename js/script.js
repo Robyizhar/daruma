@@ -24,7 +24,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll(".number-only").forEach(function (input) {
         input.addEventListener("input", function (e) {
-            e.target.value = e.target.value.replace(/\D/g, ""); // Hapus semua karakter selain angka
+            e.target.value = e.target.value.replace(/\D/g, "");
+            let max = parseInt(this.max, 10);
+            let min = parseInt(this.min, 10);
+            let value = parseInt(this.value, 10);
+
+            if (value > max) this.value = max;
+            if (value < min) this.value = min;
         });
     });
 });

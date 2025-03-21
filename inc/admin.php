@@ -16,7 +16,7 @@
     }
 
     /* Pagination */
-    $productsPerPage = 2;
+    $productsPerPage = 10;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $productsPerPage;
     $totalProducts = $Model->getTotalProducts();

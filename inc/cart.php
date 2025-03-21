@@ -21,7 +21,7 @@
             exit;
         } else {
             echo json_encode([ 
-                "data_redirect" => 'account.php',
+                "data_redirect" => 'admin.php',
                 "message" => 'Admins may not add carts'
             ]);
             exit;

@@ -8,17 +8,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll(".number-filter").forEach(function (input) {
         input.addEventListener("input", function (e) {
-            let value = e.target.value.replace(/[^0-9.]/g, ""); // Hanya angka & titik
+            let value = e.target.value.replace(/[^0-9.]/g, ""); // Hanya angka dan titik
             let floatValue = parseFloat(value);
             if (!isNaN(floatValue)) {
-                e.target.value = new Intl.NumberFormat("en-US", {
+                e.target.value = new Intl.NumberFormat("en-SG", {
                     style: "currency",
-                    currency: "USD",
+                    currency: "SGD",
                     minimumFractionDigits: 0,
                 }).format(floatValue);
             } else {
                 e.target.value = "";
             }
+        });
+    });
+
+    document.querySelectorAll(".number-only").forEach(function (input) {
+        input.addEventListener("input", function (e) {
+            e.target.value = e.target.value.replace(/\D/g, ""); // Hapus semua karakter selain angka
         });
     });
 });

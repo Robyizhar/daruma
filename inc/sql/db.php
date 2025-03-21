@@ -46,6 +46,33 @@ class Model {
         }
     }
 
+    public function deleteCartById($id, $user_id) {
+        $stmt = $this->conn->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $id, $user_id); 
+        $result = $stmt->execute();
+        $stmt->close();
+
+        if ($result)
+            return true;
+        
+        return false;
+
+    }
+
+    public function updateCartById($id, $user_id, $quantity) {
+        // Query update quantity di tabel cart dengan filter user_id
+        $stmt = $this->conn->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("iii", $quantity, $id, $user_id);
+        $result = $stmt->execute();
+        $stmt->close();
+        if ($result) {
+            return true;
+        } 
+
+        return false;
+
+    }
+
     public function getCartByUser($user_id) {
         $stmt = $this->conn->prepare("SELECT c.id, c.product_id, p.name, p.price, c.quantity, c.added_at 
             FROM cart c 

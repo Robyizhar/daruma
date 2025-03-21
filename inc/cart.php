@@ -29,18 +29,37 @@
     }
 
     /* Insert To Cart */
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $product_id = $_POST['product_id'];
-        $quantity = $_POST['quantity'];
-        $user_id = $_SESSION['user_id'];
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
 
-        $insert = $Model->addToCart($user_id, $product_id, $quantity);
-        if ($insert) {
-            echo json_encode(["success" => true, "message" => "Product successfully added to cart!", "data" => $insert]);
-        } else {
-            echo json_encode(["success" => false, "message" => "Failed to add to cart!"]);
+        if (isset($_POST['action']) && $_POST['action'] == 'add-cart' )  {
+            $product_id = $_POST['product_id'];
+            $quantity = $_POST['quantity'];
+            $user_id = $_SESSION['user_id'];
+
+            $insert = $Model->addToCart($user_id, $product_id, $quantity);
+            if ($insert) {
+                echo json_encode(["success" => true, "message" => "Product successfully added to cart!", "data" => $insert]);
+            } else {
+                echo json_encode(["success" => false, "message" => "Failed to add to cart!"]);
+            }
+            exit;
+        } else if(isset($_POST['action']) && $_POST['action'] == 'remove-cart' ) {
+            $deleted = $Model->dCartById($_POST['id'], $_SESSION['user_id']);
+            if ($deleted) {
+                echo json_encode(["success" => true, "message" => "Item successfully removed from cart!", "data" => $delete]);
+            } else {
+                echo json_encode(["success" => false, "message" => "Failed to removed from cart!"]);
+            }
+            exit;
+        } else if(isset($_POST['action']) && $_POST['action'] == 'update-cart' ) {
+            $updated = $Model->updateCartById($_POST['id'], $_SESSION['user_id'], $_POST['quantity']);
+            if ($updated) {
+                echo json_encode(["success" => true, "message" => "Item successfully removed from cart!", "data" => $updated]);
+            } else {
+                echo json_encode(["success" => false, "message" => "Failed to removed from cart!"]);
+            }
+            exit;
         }
-        exit;
     }
     /* Insert To Cart */
 
@@ -72,7 +91,8 @@
                     <th>Added Time</th>
                     <th>Quantity</th>
                     <th>Total Price</th>
-                </tr>
+                    <th>Actions</th>
+                    </tr>
             </thead>
             <tbody id="cart-table-body">
                 <?php 
@@ -81,13 +101,20 @@
                     $all_prices = 0;
                 ?>
                 <?php foreach($data_carts as $row): ?>
-                    <tr data-id="<?= $row['id'] ?>" onclick="goToProduct(<?= $row['product_id'] ?>)" style="cursor: pointer;">
-                        <td class="text-white"><?= $index; ?></td>
-                        <td class="text-white"><?= htmlspecialchars($row['name']) ?></td>
-                        <td class="text-white">$<?= number_format($row['price'], 2) ?></td>
-                        <td class="text-white"><?= htmlspecialchars($row['added_at']) ?></td>
-                        <td class="text-white"><?= htmlspecialchars($row['quantity']) ?></td>
-                        <td class="text-white text-end">$ <?= number_format(htmlspecialchars($row['quantity']) *  $row['price'], 2) ?></td>
+                    <tr data-id="<?= $row['id'] ?>" style="cursor: pointer;">
+                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= $index; ?></td>
+                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= htmlspecialchars($row['name']) ?></td>
+                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white">$<?= number_format($row['price'], 2) ?></td>
+                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= htmlspecialchars($row['added_at']) ?></td>
+                        <td class="text-white">
+                            <input style="max-width: 100px;" type="text" data-id="<?= $row['id'] ?>" class="form-control number-only cart-quantity" value="<?= htmlspecialchars($row['quantity']) ?>">
+                        </td>
+                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white text-end">$ <?= number_format(htmlspecialchars($row['quantity']) *  $row['price'], 2) ?></td>
+                        <td class="text-white text-end">
+                            <button type="button" data-id="<?= $row['id'] ?>" class="delete-cart btn btn-danger btn-sm" style="max-width: 40px;"> 
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </td>
                     </tr>
                 <?php 
                     $index++;
@@ -112,9 +139,73 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>    
     function goToProduct(productId) {
         window.location.href = `product.php?id=${productId}`;
     }
+
+    $(document).ready(function () {
+        $('.delete-cart').click(function (e) { 
+            e.preventDefault();
+
+            Swal.fire({
+                title: "Are you sure want to delete this cart?",
+                showDenyButton: true,
+                confirmButtonText: "Yes",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = {
+                        id: $(this).data("id"),
+                        action: 'remove-cart'
+                    };
+                    $.ajax({
+                        url: "cart.php", 
+                        type: "POST",
+                        data: data,
+                        dataType: "json",
+                        success: function(response) {
+                            if(response.success) {
+                                Swal.fire({ title: "Success!", text: response.message, icon: "success", timer: 2000, showConfirmButton: true }).then(() => {
+                                    window.location.assign(response.data_redirect ? response.data_redirect : "cart.php");
+                                });
+                            } else {
+                                Swal.fire({ title: "Failed!", text: response.message, icon: "warning", timer: 2000,   showConfirmButton: true }).then(() => {
+                                    window.location.assign(response.data_redirect ? response.data_redirect : "cart.php");
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({ title: "Failed!", text: xhr.responseText, icon: "error", showConfirmButton: true }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        $(".cart-quantity").on("keyup", function () {
+            let id = $(this).data("id");  
+            let quantity = $(this).val();     
+
+            if (quantity < 1) {
+                quantity = 1;
+            }
+
+            $.ajax({
+                url: "cart.php",
+                type: "POST",
+                data: { id: id, quantity: quantity, action: 'update-cart' },
+                success: function (response) {
+                    console.log("Update Successfully:", response);
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({ title: "Failed!", text: xhr.responseText, icon: "error", showConfirmButton: true });
+                }
+            });
+
+        });
+    });
 
 </script>

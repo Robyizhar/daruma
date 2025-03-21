@@ -46,7 +46,7 @@
             </p>
             <!-- Quantity Input -->
             <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" value="1" min="1" style="width: 60px; padding: 5px; text-align: center; margin-right: 10px;">
+            <input type="text" id="quantity" name="quantity" value="1" min="1" class="number-only" style="width: 60px; padding: 5px; text-align: center; margin-right: 10px;">
             <!-- Add to Cart Button -->
             <button class="add-to-cart" data-product="<?= $product['id'] ?>">Add to Cart</button>
         </div>
@@ -63,7 +63,8 @@
             e.preventDefault();
             const data = {
                 product_id: $(this).data("product"),
-                quantity: $("#quantity").val() || 1
+                quantity: $("#quantity").val() || 1, 
+                action: 'add-cart'
             };
             $.ajax({
                 url: "cart.php", 

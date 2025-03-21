@@ -188,15 +188,14 @@
                     <select class="form-select mb-2" name="category">
                         <option value="">All Categories</option>
                         <?php foreach ($categories as $category): ?>
-                            <option value="<?= htmlspecialchars($category['id']) ?>" 
-                                <?php // echo ($category['id'] == $category_id) ? 'selected' : '' ?>>
+                            <option value="<?= htmlspecialchars($category['id']) ?>">
                                 <?= htmlspecialchars($category['name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                     <input type="text" class="form-control mb-2" name="edition" placeholder="Product Edition" required>
                     <textarea class="form-control mb-2" name="description" placeholder="Product Description" required></textarea>
-                    <input type="number" class="form-control mb-2" name="price" placeholder="Price" required>
+                    <input type="text" class="form-control mb-2 number-filter" name="price" placeholder="Price" required>
                     <input type="file" class="form-control mb-2" name="image" required>
                 </form>
             </div>

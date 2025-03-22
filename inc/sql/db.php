@@ -10,18 +10,9 @@ class Model {
 
     public function __construct() {
         // Database configuration
-        // $config = [
-        //     'db_host' => 'localhost',
-        //     'db_user' => 'inf1005-sqldev',
-        //     'db_pass' => 'r2Qr3YjS',
-        //     'db_name' => 'daruma_db',
-        // ];
-        $config = [
-            'db_host' => 'localhost',
-            'db_user' => 'root',
-            'db_pass' => '',
-            'db_name' => 'daruma_db',
-        ];
+        // $config = [ 'db_host' => 'localhost', 'db_user' => 'inf1005-sqldev', 'db_pass' => 'r2Qr3YjS', 'db_name' => 'daruma_db' ];
+        $config = [ 'db_host' => 'localhost', 'db_user' => 'robbyiz1_root', 'db_pass' => 'kmzwa4x28rir', 'db_name' => 'robbyiz1_daruma_db' ];
+        // $config = [ 'db_host' => 'localhost', 'db_user' => 'root', 'db_pass' => '', 'db_name' => 'daruma_db' ];
         
         // Connect to database
         $conn = new mysqli($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);

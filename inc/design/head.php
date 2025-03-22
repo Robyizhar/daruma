@@ -4,9 +4,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#000000">
     
+    <?php 
+        require_once __DIR__ . '/../config/config.php'; 
+        
+        // Default title
+        $pageTitle = "Daruma!";
+        
+        // Dynamically set the title based on the current page
+        $currentFile = basename($_SERVER['PHP_SELF'], ".php");
 
-    <?php require_once __DIR__ . '/../config/config.php'; ?>
-    <title>Daruma! - <?= date('Y-m-d H:i:s') ?></title>
+        switch ($currentFile) {
+            case 'index':
+                $pageTitle .= " - Home";
+                break;
+            case 'products':
+                $pageTitle .= " - Products";
+                break;
+            case 'about':
+                $pageTitle .= " - About Us";
+                break;
+            case 'account':
+                $pageTitle .= " - Account";
+                break;
+            case 'register':
+                $pageTitle .= " - Register";
+                break;
+            case 'cart':
+                $pageTitle .= " - Shopping Cart";
+                break;
+            case 'checkout':
+                $pageTitle .= " - Checkout";
+                break;
+            case 'admin':
+                $pageTitle .= " - Admin Panel";
+                break;
+            default:
+                $pageTitle .= "";
+                break;
+        }
+    ?>
+
+    <title><?= $pageTitle ?></title>
 
     <link rel="icon" type="image/x-icon" href="<?= base_url('images/favicon.ico') ?>">
     <link rel="shortcut icon" href="/favicon.ico">
@@ -21,4 +59,3 @@
     <script defer src="<?= base_url('js/script.js') ?>"></script>
 </head>
 <body>
-

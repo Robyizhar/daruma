@@ -14,6 +14,8 @@
  Date: 21/03/2025 16:22:07
 */
 
+USE daruma_db;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

@@ -58,7 +58,7 @@
                     </a>
                     <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($row['name']) ?></a></h3>
                     <p class="text-muted"><?= htmlspecialchars($row['edition']) ?></p>
-                    <p class="fw-bold">From $<?= number_format($row['price'], 2) ?></p>
+                    <p class="fw-bold">$<?= number_format($row['price'], 2) ?></p>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -81,7 +81,7 @@
                     </a>
                     <h3><a href="<?= $product_url ?>"><?= htmlspecialchars($row['name']) ?></a></h3>
                     <p class="text-muted"><?= htmlspecialchars($row['edition']) ?></p>
-                    <p class="fw-bold">From $<?= number_format($row['price'], 2) ?></p>
+                    <p class="fw-bold">$<?= number_format($row['price'], 2) ?></p>
                 </div>
             </div>
         <?php endforeach; ?>

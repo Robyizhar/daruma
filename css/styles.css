@@ -63,6 +63,7 @@ nav a {
 
 nav a:hover {
     background-color: #9b0000;
+    color: white;
     border-radius: 5px;
 }
 
@@ -72,7 +73,6 @@ nav a.active {
 
 .text-center {
     text-align: center;
-
 }
 
 /* Hamburger Menu */
@@ -109,7 +109,6 @@ nav a.active {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* 3 per row */
     gap: 20px;
-    /* padding: 20px; */
     justify-content: center;
 }
 
@@ -168,6 +167,7 @@ nav a.active {
 
 .buy-now:hover {
     background: #9b0000;
+    color: white;
     transform: scale(1.05);
 }
 
@@ -206,17 +206,8 @@ nav a.active {
     width: 100%;
 }
 
-/* label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: white;
-    text-align: center;
-    width: 100%;
-} */
-
 input {
     width: 80%; 
-    /* max-width: 300px;  */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -383,17 +374,26 @@ footer {
     min-height: 100vh;
     padding: 15px;
 }
+
 .sidebar a {
     color: white;
     text-decoration: none;
     display: block;
     padding: 10px;
 }
+
 .sidebar a:hover {
     background-color: #495057;
     border-radius: 5px;
 }
+
 .content {
     flex-grow: 1;
     padding: 20px;
+}
+
+/* FAQ Question Hover */
+.faq-question:hover {
+    background-color: #f0f0f0 !important; /* Change to your preferred color */
+    color: #820000 !important;
 }

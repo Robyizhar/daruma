@@ -22,5 +22,8 @@
     $('#customer-cart').removeClass('d-none');
 </script>
 <?php endif; ?>
+<?php if(isset($_SESSION['user_id'])): ?>
+    <script>$('.register-menu').addClass('d-none')</script>
+<?php endif; ?>
 </body>
 </html>

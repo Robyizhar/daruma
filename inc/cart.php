@@ -76,7 +76,6 @@
     include("../inc/design/head.php"); 
     include("../inc/design/header.php"); 
     include("../inc/design/nav.php"); 
-    include("../inc/design/footer.php");
 ?>
 <style>
     #cart-table-body tr {
@@ -88,7 +87,7 @@
     }
 </style>
 <div class="container mt-5">
-    <h2 class="mb-4">Keranjang Belanja</h2>
+    <h2 class="mb-4">Your Cart</h2>
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
@@ -112,7 +111,7 @@
                     <tr data-id="<?= $row['id'] ?>" style="cursor: pointer;">
                         <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= $index; ?></td>
                         <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= htmlspecialchars($row['name']) ?></td>
-                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white">$<?= number_format($row['price'], 2) ?></td>
+                        <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white">$ <?= number_format($row['price'], 2) ?></td>
                         <td onclick="goToProduct(<?= $row['product_id'] ?>)" class="text-white"><?= htmlspecialchars($row['added_at']) ?></td>
                         <td class="text-white">
                             <input style="max-width: 100px;" type="number" min="1" max="<?= $row['stock'] ?>" data-id="<?= $row['id'] ?>" disabled class="form-control number-only cart-quantity" value="<?= htmlspecialchars($row['quantity']) ?>">
@@ -164,7 +163,7 @@
             e.preventDefault();
 
             Swal.fire({
-                title: "Are you sure want to delete this cart?",
+                title: "Are you sure want to remove this item from the cart?",
                 showDenyButton: true,
                 confirmButtonText: "Yes",
             }).then((result) => {
@@ -241,3 +240,4 @@
     }
 
 </script>
+<?php include("../inc/design/footer.php"); ?>

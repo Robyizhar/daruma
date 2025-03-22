@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = $_POST['user_email'];
         $name = $_POST['user_name'];
         $subject = "Your Order Has Been Confirmed";
-        $body = "<h3>Hallo $name,</h3><p>Your order is being processed. Thank you for shopping at our store!</p>";
+        $body = "<h3>Hello $name,</h3><p>Your order is being processed. Thank you for shopping at our store!</p>";
         // Send email
         echo sendEmail($email, $name, $subject, $body);
     }
